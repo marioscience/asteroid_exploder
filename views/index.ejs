@@ -10,10 +10,10 @@
             <section id="mainMenu" class="screen">
                 <h1 class="title"><%= title %></h1>
                 <h3 class="screen-title">Main Menu</h3>
-                <button id="btnNewGame">New Game</button>
-                <button id="btnHighscores">Highscores</button>
-                <button id="btnOptions">Options</button>
-                <button id="btnCredits">Credits</button>
+                <button id="btnNewGame" class="menu-item">New Game</button>
+                <button id="btnHighscores" class="menu-item">Highscores</button>
+                <button id="btnOptions" class="menu-item">Options</button>
+                <button id="btnCredits" class="menu-item">Credits</button>
             </section>
 
             <section id="highscoresMenu" class="screen">
@@ -32,8 +32,8 @@
             <section id="optionsMenu" class="screen">
                 <h1 class="title"><%= title %></h1>
                 <h3 class="screen-title">Options</h3>
-                <button id="btnKeyboard">Keyboard</button>
-                <button id="btnSounds">Sounds</button>
+                <button id="btnKeyboard" class="menu-item">Keyboard</button>
+                <button id="btnSounds" class="menu-item">Sounds</button>
                 <button class="backButton">&#8626;</button>
             </section>
 
@@ -41,14 +41,33 @@
                 <h1 class="title"><%= title %></h1>
                 <h3 class="screen-title">Keyboard Settings</h3>
                 <div class="config-container">
-                    <span class="config-item"><label for="txtUp">Up</label> <input type="text" id="txtUp"></span>
-                    <span class="config-item"><label for="txtDown">Down</label> <input type="text" id="txtDown"></span>
-                    <span class="config-item"><label for="txtLeft">Left</label> <input type="text" id="txtLeft"></span>
-                    <span class="config-item"><label for="txtRight">Right</label> <input type="text" id="txtRight"></span>
-                    <span class="config-item"><label for="txtShoot">Shoot</label> <input type="text" id="txtShoot"></span>
-                    <span class="config-item"><label for="txtHyperspace">Hyperspace</label> <input type="text" id="txtHyperspace"></span>
+                    <span class="config-item">
+                        <label for="txtUp">Up</label>
+                        <input type="text" class="key-input" id="txtUp" data-key="">
+                    </span>
+                    <span class="config-item">
+                        <label for="txtDown">Down</label>
+                        <input type="text" class="key-input" id="txtDown" data-key="">
+                    </span>
+                    <span class="config-item">
+                        <label for="txtLeft">Left</label>
+                        <input type="text" class="key-input" id="txtLeft" data-key="">
+                    </span>
+                    <span class="config-item">
+                        <label for="txtRight">Right</label>
+                        <input type="text" class="key-input" id="txtRight" data-key="">
+                    </span>
+                    <span class="config-item">
+                        <label for="txtShoot">Shoot</label>
+                        <input type="text" class="key-input" id="txtShoot" data-key="">
+                    </span>
+                    <span class="config-item">
+                        <label for="txtHyperspace">Hyperspace</label>
+                        <input type="text" class="key-input" id="txtHyperspace" data-key="">
+                    </span>
                 </div>
                 <button class="backButton">&#8626;</button>
+                <button id="btnApplyKeys" class="applyButton">Apply</button>
             </section>
 
             <section id="audioMenu" class="screen">
@@ -65,6 +84,7 @@
                     </span>
                 </div>
                 <button class="backButton">&#8626;</button>
+                <button id="btnApplyAudio" class="applyButton">Apply</button>
             </section>
 
             <section id="credits" class="screen">

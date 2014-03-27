@@ -15,7 +15,9 @@ var AsteroidsGame = (function(self) {
     var currentMode;
 
     self.initialize = function() {
+        self.configuration.loadConfigurations();
         self.graphics.initializeInterface();
+        self.input.updateKeyBindings();
     };
 
     self.startNewSimulation = function() {
@@ -24,6 +26,15 @@ var AsteroidsGame = (function(self) {
 
     self.startNewGame = function() {
         startGameMode(gameModes.user);
+    };
+
+    self.changeKeyConfig = function(config) {
+        self.configuration.saveKeyConfig(config);
+        self.input.updateKeyBindings();
+    };
+
+    self.changeAudioConfig = function(config) {
+        self.configuration.saveAudioConfig(config);
     };
 
     function startGameMode(mode) {
@@ -42,7 +53,7 @@ var AsteroidsGame = (function(self) {
 
         update(elapsedTime);
         render(elapsedTime);
-		requestAnimationFrame(gameLoop);
+		requestAnimationFrame(gameLoop, null);
 	}
 
     function update(elapsedTime) {

@@ -15,9 +15,11 @@ window.addEventListener('load', function() {
 			load : [
                 'preload!javascripts/vendor/jquery-1.11.0.min.js',
                 'preload!javascripts/asteroids.js',
-                'preload!javascripts/graphics.js',
-                'preload!javascripts/audio.js',
                 'preload!javascripts/input.js',
+                'preload!javascripts/audio.js',
+                'preload!javascripts/graphics.js',
+                'preload!javascripts/configuration.js',
+
                 'preload!javascripts/logic.js',
 
                 'preload!images/background.png',
@@ -66,10 +68,26 @@ yepnope.addPrefix('preload', function(resource) {
 });
 
 /*
-Storage.prototype.setObj = function(key, obj) {
-    return this.setItem(key, JSON.stringify(obj))
+ *  Extend the storage object to save data as a json string.
+ */
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
 }
-Storage.prototype.getObj = function(key) {
-    return JSON.parse(this.getItem(key))
+
+Storage.prototype.getObject = function(key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
 }
-*/
+
+
+/*
+ *  Extend object type to get an attribute name by its value.
+ */
+Object.prototype.getKeyByValue = function( value ) {
+    for( var prop in this ) {
+        if( this.hasOwnProperty( prop ) ) {
+             if( this[ prop ] === value )
+                 return prop;
+        }
+    }
+};
