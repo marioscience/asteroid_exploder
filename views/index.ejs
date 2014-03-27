@@ -1,11 +1,86 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+    <head><title><%= title %></title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <script src="/javascripts/vendor/modernizr.js"></script>
+        <script src="/javascripts/loader.js"></script>
+    </head>
+    <body>
+        <div id="main">
+            <section id="mainMenu" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Main Menu</h3>
+                <button id="btnNewGame">New Game</button>
+                <button id="btnHighscores">Highscores</button>
+                <button id="btnOptions">Options</button>
+                <button id="btnCredits">Credits</button>
+            </section>
+
+            <section id="highscoresMenu" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Highscores</h3>
+                <table id="totalScores">
+                    <thead>
+                        <tr>
+                            <th></th><th>Total Highscore</th>
+                        </tr>
+                    </thead>
+                </table>
+                <button class="backButton">&#8626;</button>
+            </section>
+
+            <section id="optionsMenu" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Options</h3>
+                <button id="btnKeyboard">Keyboard</button>
+                <button id="btnSounds">Sounds</button>
+                <button class="backButton">&#8626;</button>
+            </section>
+
+            <section id="keyboardMenu" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Keyboard Settings</h3>
+                <div class="config-container">
+                    <span class="config-item"><label for="txtUp">Up</label> <input type="text" id="txtUp"></span>
+                    <span class="config-item"><label for="txtDown">Down</label> <input type="text" id="txtDown"></span>
+                    <span class="config-item"><label for="txtLeft">Left</label> <input type="text" id="txtLeft"></span>
+                    <span class="config-item"><label for="txtRight">Right</label> <input type="text" id="txtRight"></span>
+                    <span class="config-item"><label for="txtShoot">Shoot</label> <input type="text" id="txtShoot"></span>
+                    <span class="config-item"><label for="txtHyperspace">Hyperspace</label> <input type="text" id="txtHyperspace"></span>
+                </div>
+                <button class="backButton">&#8626;</button>
+            </section>
+
+            <section id="audioMenu" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Audio Options</h3>
+                <div class="config-container">
+                    <span class="config-item">
+                        <label for="sliderMusic">Music</label>
+                        <input id="sliderMusic" type="range" name="points" min="0" max="100">
+                    </span>
+                    <span class="config-item">
+                        <label for="sliderFx">Effects</label>
+                        <input id="sliderFx" type="range" name="points" min="0" max="100">
+                    </span>
+                </div>
+                <button class="backButton">&#8626;</button>
+            </section>
+
+            <section id="credits" class="screen">
+                <h1 class="title"><%= title %></h1>
+                <h3 class="screen-title">Credits</h3>
+                <div id="credit-content">
+                    <span>Developed by:</span>
+                    <span>Juan Caraballo</span>
+                    <span>Mario Matos</span>
+                </div>
+                <button class="backButton">&#8626;</button>
+            </section>
+
+            <section id="game" class="screen">
+                <canvas id="game-canvas" height="670" width="870"></canvas>
+            </section>
+        </div>
+    </body>
 </html>
