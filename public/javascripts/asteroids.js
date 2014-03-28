@@ -27,6 +27,8 @@ var AsteroidsGame = (function(self) {
         self.score = 0;
         self.gameActive = true;
         self.objects.ship.setPosition({ x: self.graphics.canvas.width/2, y: self.graphics.canvas.height/2 });
+        //intialize load asteroids and aliens
+        self.objects.loadAsteroids(10);
         startTimeStamp = lastTimeStamp = performance.now();
 		requestAnimationFrame(gameLoop);
     };
@@ -58,12 +60,19 @@ var AsteroidsGame = (function(self) {
         self.objects.ship.moveForward(elapsedTime);
         //self.objects.ship.move somewhere depending on input
         //self.objects.asteroids.foreach( move in the direction they are going. )
+        self.objects.asteroids.forEach(function(asteroid){
+            asteroid.rotateLeft(elapsedTime);
+            asteroid.moveInInitialDirection(elapsedTime);
+        });
     }
 
     function render() {
         self.graphics.clear();
         self.graphics.drawBackground();
         self.objects.ship.render();
+        self.objects.asteroids.forEach(function(asteroid){
+            asteroid.render();
+        });
     }
 
     return self;

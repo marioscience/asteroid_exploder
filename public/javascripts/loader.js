@@ -21,6 +21,7 @@ window.addEventListener('load', function() {
 
                 'preload!images/background.png',
                 'preload!images/assassin_ship.png',
+                'preload!images/asteroid_big1.png',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',

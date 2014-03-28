@@ -11,7 +11,7 @@ AsteroidsGame.objects = (function(self) {
 
     var graphics = AsteroidsGame.graphics;
     var shipImage = graphics.images['images/assassin_ship.png'];
-    var asteroidImage = {};//graphics.images['images/assassin_ship.png'];
+    var asteroidImage = graphics.images['images/asteroid_big1.png'];
     var alienImage = {};//graphics.images['images/assassin_ship.png'];
 
 
@@ -29,6 +29,7 @@ AsteroidsGame.objects = (function(self) {
 
     self.loadAliens = function(amount) {
         while (--amount) {
+            var sel = Math.floor((Math.random()*2)+1);
             var alienType = alienTypes.big; // determine alien type randomly and whatnot.
             var alien = Texture({
                 image: shipImage,
@@ -45,7 +46,19 @@ AsteroidsGame.objects = (function(self) {
 
     self.loadAsteroids = function(amount) {
         while (--amount) {
-            var asteroid = Texture({}); // lo mimo que lo alien
+            var side = Math.floor((Math.random()*2)+1);
+            var sizeArr = [asteroidTypes.big, asteroidTypes.medium, asteroidTypes.small];
+            var size = Math.floor((Math.random()*2));
+            var asteroid = Texture({
+                image: asteroidImage,
+                position: { x: (side == 1)? 0 : graphics.canvas.width, y: Math.floor(Math.random()*graphics.canvas.width) }, // en un edge del canvas, 'y' es random
+                size: { width: sizeArr[size].size, height: sizeArr[size].size * asteroidImage.height / asteroidImage.width },
+                rotateRate:  Math.floor((Math.random()*35)+15), // FUCKING ALIENS! YOU GET NOTHING! ----> 0
+                moveRate: Math.floor((Math.random()*35)+5), // la veldadera velocida de la lu lucina.
+                angle: (side == 1)? Math.floor((Math.random()*170)+10) : -(Math.floor((Math.random()*170)+10)), // una direccion random, preferiblemente opuesta al lado en que salio.
+                side_end: (side == 1)? 'right': 'left'
+            });
+
             self.asteroids.push(asteroid);
         }
     };
@@ -54,6 +67,8 @@ AsteroidsGame.objects = (function(self) {
         var that = {};
         var canvas = AsteroidsGame.graphics.canvas;
         var context = AsteroidsGame.graphics.context;
+
+        that.initialAngle = spec.angle;
 
         that.rotateRight = function(elapsedTime) {
 			spec.angle += spec.rotateRate * (elapsedTime / 1000);
@@ -66,11 +81,13 @@ AsteroidsGame.objects = (function(self) {
 		};
 
 		that.moveForward = function(elapsedTime) {
-			spec.position.x += spec.moveRate * (elapsedTime / 1000) * Math.sin(spec.angle * Math.PI / 180);
-            spec.position.x = ((spec.position.x <= 0)? canvas.width: spec.position.x) % (canvas.width + 1);
-            spec.position.y += spec.moveRate * (elapsedTime / 1000) * Math.cos(spec.angle * Math.PI / 180);
-            spec.position.y = ((spec.position.y <= 0)? canvas.height: spec.position.y) % (canvas.height + 1);
+			move(elapsedTime, spec.angle);
 		};
+
+        that.moveInInitialDirection = function(elapsedTime) {
+            move(elapsedTime, that.initialAngle);
+        };
+
 
         that.render = function() {
             context.save();
@@ -93,6 +110,13 @@ AsteroidsGame.objects = (function(self) {
             spec.position.x = newPosition.x;
             spec.position.y = newPosition.y;
         };
+
+        function move(elapsedTime, angle) {
+            spec.position.x += spec.moveRate * (elapsedTime / 1000) * Math.sin(angle * Math.PI / 180);
+            spec.position.x = ((spec.position.x <= 0)? canvas.width: spec.position.x) % (canvas.width + 1);
+            spec.position.y += spec.moveRate * (elapsedTime / 1000) * Math.cos(angle * Math.PI / 180);
+            spec.position.y = ((spec.position.y <= 0)? canvas.height: spec.position.y) % (canvas.height + 1);
+        }
 
         return that;
     }
