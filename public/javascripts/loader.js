@@ -13,16 +13,14 @@ window.addEventListener('load', function() {
     Modernizr.load([
 		{
 			load : [
+
                 'preload!javascripts/vendor/jquery-1.11.0.min.js',
                 'preload!javascripts/asteroids.js',
-                'preload!javascripts/input.js',
-                'preload!javascripts/audio.js',
                 'preload!javascripts/graphics.js',
-                'preload!javascripts/configuration.js',
-
-                'preload!javascripts/logic.js',
+                'preload!javascripts/audio.js',
 
                 'preload!images/background.png',
+                'preload!images/assassin_ship.png',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',
@@ -31,7 +29,13 @@ window.addEventListener('load', function() {
                 'preload!audio/pew.wav',
                 'preload!audio/alien.wav',
                 'preload!audio/ship_explosion.wav',
-                'preload!audio/rock_explosion.wav'
+                'preload!audio/rock_explosion.wav',
+
+
+                'preload!javascripts/input.js',
+                'preload!javascripts/objects.js',
+                'preload!javascripts/configuration.js',
+                'preload!javascripts/logic.js'
 			],
 			complete : function() {
 				console.log('All files requested for loading...');
@@ -60,7 +64,6 @@ yepnope.addPrefix('preload', function(resource) {
 
 		if (AsteroidsGame.status.preloadComplete === AsteroidsGame.status.preloadRequest) { // EVERYTHING FINISHED LOADING
             AsteroidsGame.initialize();
-            AsteroidsGame.startNewSimulation();
 		}
 	};
 

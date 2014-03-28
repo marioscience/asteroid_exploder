@@ -8,11 +8,11 @@ var AsteroidsGame = (function(self) {
     self.gameActive = false;
     self.gameTime = 0;
     self.score = 0;
+    self.level = 0;
 
-    var gameModes = { user: {}, pc: {} };
+
     var startTimeStamp = 0;
     var lastTimeStamp = 0;
-    var currentMode;
 
     self.initialize = function() {
         self.configuration.loadConfigurations();
@@ -20,12 +20,16 @@ var AsteroidsGame = (function(self) {
         self.input.updateKeyBindings();
     };
 
-    self.startNewSimulation = function() {
-        startGameMode(gameModes.pc);
+    self.startAttractMode = function() {
+        //TODO: develop ai for attract mode
     };
 
     self.startNewGame = function() {
-        startGameMode(gameModes.user);
+        self.score = 0;
+        self.gameActive = true;
+        self.objects.ship.setPosition({ x: self.graphics.canvas.width/2, y: self.graphics.canvas.height/2 });
+        startTimeStamp = lastTimeStamp = performance.now();
+		requestAnimationFrame(gameLoop);
     };
 
     self.changeKeyConfig = function(config) {
@@ -36,13 +40,6 @@ var AsteroidsGame = (function(self) {
     self.changeAudioConfig = function(config) {
         self.configuration.saveAudioConfig(config);
     };
-
-    function startGameMode(mode) {
-        currentMode = mode;
-        self.gameActive = true;
-        startTimeStamp = lastTimeStamp = performance.now();
-		requestAnimationFrame(gameLoop);
-    }
 
     function gameLoop(timestamp) {
         if (!self.gameActive) {
@@ -57,14 +54,15 @@ var AsteroidsGame = (function(self) {
 	}
 
     function update(elapsedTime) {
-        self.gameTime = lastTimeStamp - startTimeStamp;
-        //if it's a simulation, move ship by itself.
-        //if not... then yeah.
+        self.gameTime = startTimeStamp - lastTimeStamp;
+        //self.objects.ship.move somewhere depending on input
+        //self.objects.asteroids.foreach( move in the direction they are going. )
     }
 
     function render(elapsedTime) {
         self.graphics.clear();
         self.graphics.drawBackground();
+        self.objects.ship.render();
     }
 
     return self;
