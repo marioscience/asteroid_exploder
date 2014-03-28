@@ -15,6 +15,7 @@ window.addEventListener('load', function() {
 			load : [
 
                 'preload!javascripts/vendor/jquery-1.11.0.min.js',
+                'preload!javascripts/vendor/random.js',
                 'preload!javascripts/asteroids.js',
                 'preload!javascripts/graphics.js',
                 'preload!javascripts/audio.js',
@@ -22,6 +23,7 @@ window.addEventListener('load', function() {
                 'preload!images/background.png',
                 'preload!images/assassin_ship.png',
                 'preload!images/asteroid_big1.png',
+                'preload!images/planet_1.png',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',
