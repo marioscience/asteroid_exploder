@@ -11,7 +11,6 @@ AsteroidsGame.configuration = (function(self) {
 
     self.keyboard = {
         up: KeyEvent.DOM_VK_UP,
-        down: KeyEvent.DOM_VK_DOWN,
         left: KeyEvent.DOM_VK_LEFT,
         right: KeyEvent.DOM_VK_RIGHT,
         hyperspace: KeyEvent.DOM_VK_CONTROL,
@@ -22,7 +21,6 @@ AsteroidsGame.configuration = (function(self) {
         var keysConfig = localStorage.getObject('keys') || {};
         var audioConfig = localStorage.getObject('audio') || {};
         self.keyboard.up = keysConfig.up || self.keyboard.up;
-        self.keyboard.down = keysConfig.down || self.keyboard.down;
         self.keyboard.left = keysConfig.left || self.keyboard.left;
         self.keyboard.right = keysConfig.right || self.keyboard.right;
         self.keyboard.shoot = keysConfig.shoot || self.keyboard.shoot;
@@ -33,7 +31,6 @@ AsteroidsGame.configuration = (function(self) {
 
     self.saveKeyConfig = function(config) {
         self.keyboard.up = config.up || self.keyboard.up;
-        self.keyboard.down = config.down || self.keyboard.down;
         self.keyboard.left = config.left || self.keyboard.left;
         self.keyboard.right = config.right || self.keyboard.right;
         self.keyboard.hyperspace = config.hyperspace || self.keyboard.hyperspace;

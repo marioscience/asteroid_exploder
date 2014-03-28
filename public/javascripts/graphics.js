@@ -22,10 +22,10 @@ AsteroidsGame.graphics = (function(self, $) {
     var screenStack = [];
 
     self.initializeInterface = function() {
-        window.addEventListener('resize', resizeCanvas, false);
         bindMenuEvents();
         resizeCanvas();
 
+        self.drawBackground();
         self.context.textAlign = 'center';
         screenStack.push(self.screens.menu);
         self.currentScreen = self.screens.menu;
@@ -39,6 +39,10 @@ AsteroidsGame.graphics = (function(self, $) {
     self.drawBackground = function() {
         var background = self.images['images/background.png'];
         self.context.drawImage(background, 0, 0, self.canvas.width, self.canvas.height);
+    };
+
+    self.drawShip = function(position) {
+
     };
 
     function resizeCanvas() {
@@ -56,11 +60,15 @@ AsteroidsGame.graphics = (function(self, $) {
         $('button#btnHighscores').click(function() { goToScreen(self.screens.highscores); });
         $('button#btnCredits').click(function() { goToScreen(self.screens.credits); });
         $('button#btnSounds').click(function() { goToScreen(self.screens.audio); });
-        $('button#btnNewGame').click(function() { goToScreen(self.screens.game); });
         $('button#btnApplyAudio').click(function() { applyAudioConfig(); });
         $('button#btnApplyKeys').click(function() { applyKeyConfig(); });
-
         $('.backButton').click(function() { outOfScreen(); });
+
+        $('button#btnNewGame').click(function() {
+            goToScreen(self.screens.game);
+            AsteroidsGame.startNewGame();
+        });
+
         $('.key-input').keydown(function(event) {
             var key = (window.Event) ? event.which : event.keyCode;
             if (key == KeyEvent.DOM_VK_TAB) {
@@ -120,7 +128,6 @@ AsteroidsGame.graphics = (function(self, $) {
     function retrieveKeyConfig() {
         return {
             up: +$('#txtUp').get(0).dataset.key,
-            down: +$('#txtDown').get(0).dataset.key,
             right: +$('#txtRight').get(0).dataset.key,
             hyperspace: +$('#txtHyperspace').get(0).dataset.key,
             shoot: +$('#txtShoot').get(0).dataset.key,
@@ -140,8 +147,6 @@ AsteroidsGame.graphics = (function(self, $) {
         var keyConfig = AsteroidsGame.configuration.keyboard;
         $('#txtUp').val(getKeyName(keyConfig.up))
             .get(0).dataset.key = keyConfig.up;
-        $('#txtDown').val(getKeyName(keyConfig.down))
-            .get(0).dataset.key = keyConfig.down;
         $('#txtRight').val(getKeyName(keyConfig.right))
             .get(0).dataset.key = keyConfig.right;
         $('#txtHyperspace').val(getKeyName(keyConfig.hyperspace))
