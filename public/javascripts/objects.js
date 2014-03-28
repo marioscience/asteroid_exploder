@@ -22,8 +22,8 @@ AsteroidsGame.objects = (function(self) {
         image: shipImage,
         position: { x: graphics.canvas.width / 2, y: graphics.canvas.height / 2 },
         size: { width: 20, height: 20 * shipImage.height / shipImage.width },
-        rotateRate:50,
-        moveRate: 80,
+        rotateRate: 300,
+        moveRate: 260,
         angle: 60
     });
 

@@ -5,14 +5,41 @@
 AsteroidsGame.input = (function(self) {
     "use strict";
 
+    self.keyPresses = {};
+    self.keyBindings = [];
+
+    self.updateKeyBindings = function() {
+        var keyCodes = AsteroidsGame.configuration.keyboard;
+        registerKeyBinding(keyCodes.up, AsteroidsGame.moveShip);
+        registerKeyBinding(keyCodes.left, AsteroidsGame.rotateShipLeft);
+        registerKeyBinding(keyCodes.right, AsteroidsGame.rotateShipRight);
+        registerKeyBinding(keyCodes.hyperspace, AsteroidsGame.enterHyperspace);
+        registerKeyBinding(keyCodes.shoot, AsteroidsGame.shootLaser);
+    }
+
     self.getKeyName = function(keyCode) {
         return KeyEvent.getKeyByValue(keyCode).split("VK_").pop();
     };
 
+    function registerKeyBinding(key, handler) {
+        self.keyBindings.push({
+            key: key,
+            handler: handler
+        });
+    };
 
-    self.updateKeyBindings = function() {
-        //TODO: get key bindings from configuration and actually bind it here.
+    function keyPress(event) {
+        var key = (window.Event) ? event.which : event.keyCode;
+        self.keyPresses[key] = event.timeStamp;
     }
+
+    function keyRelease(event) {
+        var key = (window.Event) ? event.which : event.keyCode;
+        delete self.keyPresses[key];
+    }
+
+    window.addEventListener('keydown', keyPress, false);
+    window.addEventListener('keyup', keyRelease, false);
 
     return self;
 }(AsteroidsGame.input || {}));

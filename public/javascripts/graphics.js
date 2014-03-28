@@ -41,10 +41,6 @@ AsteroidsGame.graphics = (function(self, $) {
         self.context.drawImage(background, 0, 0, self.canvas.width, self.canvas.height);
     };
 
-    self.drawShip = function(position) {
-
-    };
-
     function resizeCanvas() {
         var width = $(window).width();
         var height = $(window).height();

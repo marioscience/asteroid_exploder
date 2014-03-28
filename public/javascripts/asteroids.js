@@ -26,10 +26,10 @@ var AsteroidsGame = (function(self) {
     self.startNewGame = function() {
         self.score = 0;
         self.gameActive = true;
+        self.objects.loadAliens(10);
+        self.objects.loadAsteroids(20);
         self.objects.ship.setPosition({ x: self.graphics.canvas.width/2, y: self.graphics.canvas.height/2 });
         //intialize load asteroids and aliens
-        self.objects.loadAsteroids(20);
-        self.objects.loadAliens(10);
         startTimeStamp = lastTimeStamp = performance.now();
 		requestAnimationFrame(gameLoop);
     };
@@ -41,6 +41,26 @@ var AsteroidsGame = (function(self) {
 
     self.changeAudioConfig = function(config) {
         self.configuration.saveAudioConfig(config);
+    };
+
+    self.moveShip = function(elapsedTime) {
+        self.objects.ship.moveForward(elapsedTime);
+    };
+
+    self.rotateShipRight = function(elapsedTime) {
+        self.objects.ship.rotateRight(elapsedTime);
+    };
+
+    self.rotateShipLeft = function(elapsedTime) {
+        self.objects.ship.rotateLeft(elapsedTime);
+    };
+
+    self.enterHyperspace = function(elapsedTime) {
+        //TODO: implement hyperspace
+    };
+
+    self.shootLaser = function(elapsedTime) {
+        //TODO: implement shooting system
     };
 
     function gameLoop(timestamp) {
@@ -58,9 +78,13 @@ var AsteroidsGame = (function(self) {
 
     function update(elapsedTime) {
         self.gameTime = startTimeStamp - lastTimeStamp;
-        self.objects.ship.moveForward(elapsedTime);
-        //self.objects.ship.move somewhere depending on input
-        //self.objects.asteroids.foreach( move in the direction they are going. )
+        
+        self.input.keyBindings.forEach(function(binding) {
+            if (self.input.keyPresses.hasOwnProperty(binding.key)) {
+                binding.handler(elapsedTime);
+            }
+        });
+        
         self.objects.asteroids.forEach(function(asteroid){
             asteroid.rotateLeft(elapsedTime);
             asteroid.moveInInitialDirection(elapsedTime);
