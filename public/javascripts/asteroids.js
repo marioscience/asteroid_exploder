@@ -10,7 +10,6 @@ var AsteroidsGame = (function(self) {
     self.score = 0;
     self.level = 0;
 
-
     var startTimeStamp = 0;
     var lastTimeStamp = 0;
 
@@ -45,21 +44,23 @@ var AsteroidsGame = (function(self) {
         if (!self.gameActive) {
             return;
         }
+
         var elapsedTime = lastTimeStamp - timestamp;
         lastTimeStamp = timestamp;
-
         update(elapsedTime);
-        render(elapsedTime);
+        render();
+
 		requestAnimationFrame(gameLoop, null);
 	}
 
     function update(elapsedTime) {
         self.gameTime = startTimeStamp - lastTimeStamp;
+        self.objects.ship.moveForward(elapsedTime);
         //self.objects.ship.move somewhere depending on input
         //self.objects.asteroids.foreach( move in the direction they are going. )
     }
 
-    function render(elapsedTime) {
+    function render() {
         self.graphics.clear();
         self.graphics.drawBackground();
         self.objects.ship.render();
