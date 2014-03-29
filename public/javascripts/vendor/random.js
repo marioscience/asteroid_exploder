@@ -11,6 +11,10 @@ var Random = (function() {
 		var range = max - min + 1;
 		return Math.floor((Math.random() * range) + min);
 	}
+
+    function nextDoubleRange(min, max) {
+        return Math.random() < 0.5 ? ((1 - Math.random()) * (max-min) + min) : (Math.random() * (max-min) + min);
+    }
 	
 	function nextCircleVector() {
 		var angle = Math.random() * 2 * Math.PI;
@@ -60,6 +64,7 @@ var Random = (function() {
 	return {
 		nextDouble : nextDouble,
 		nextRange : nextRange,
+        nextDoubleRange : nextDoubleRange,
 		nextCircleVector : nextCircleVector,
 		nextGaussian : nextGaussian
 	};

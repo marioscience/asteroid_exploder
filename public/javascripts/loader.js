@@ -13,7 +13,6 @@ window.addEventListener('load', function() {
     Modernizr.load([
 		{
 			load : [
-
                 'preload!javascripts/vendor/jquery-1.11.0.min.js',
                 'preload!javascripts/vendor/random.js',
                 'preload!javascripts/asteroids.js',
@@ -24,6 +23,7 @@ window.addEventListener('load', function() {
                 'preload!images/assassin_ship.png',
                 'preload!images/asteroid_big1.png',
                 'preload!images/planet_1.png',
+                'preload!images/laser_shot.png',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',
@@ -65,7 +65,7 @@ yepnope.addPrefix('preload', function(resource) {
         }
 		AsteroidsGame.status.preloadComplete += 1;
 
-		if (AsteroidsGame.status.preloadComplete === AsteroidsGame.status.preloadRequest) { // EVERYTHING FINISHED LOADING
+		if (AsteroidsGame.status.preloadComplete === AsteroidsGame.status.preloadRequest) {
             AsteroidsGame.initialize();
 		}
 	};
@@ -78,12 +78,12 @@ yepnope.addPrefix('preload', function(resource) {
  */
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
-}
+};
 
 Storage.prototype.getObject = function(key) {
     var value = this.getItem(key);
     return value && JSON.parse(value);
-}
+};
 
 
 /*
@@ -96,4 +96,58 @@ Object.prototype.getKeyByValue = function( value ) {
                  return prop;
         }
     }
+    return null;
 };
+
+/*
+ * Extend Function type to debounce.
+ */
+
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		clearTimeout(timeout);
+		timeout = setTimeout(function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		}, wait);
+		if (immediate && !timeout) func.apply(context, args);
+	};
+}
+
+
+/*
+ * Array.indexOf polyfill
+ */
+
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (searchElement, fromIndex) {
+      if ( this === undefined || this === null ) {
+        throw new TypeError( '"this" is null or not defined' );
+      }
+
+      var length = this.length >>> 0; // Hack to convert object.length to a UInt32
+
+      fromIndex = +fromIndex || 0;
+
+      if (Math.abs(fromIndex) === Infinity) {
+        fromIndex = 0;
+      }
+
+      if (fromIndex < 0) {
+        fromIndex += length;
+        if (fromIndex < 0) {
+          fromIndex = 0;
+        }
+      }
+
+      for (;fromIndex < length; fromIndex++) {
+        if (this[fromIndex] === searchElement) {
+          return fromIndex;
+        }
+      }
+
+      return -1;
+    };
+  }

@@ -26,10 +26,9 @@ var AsteroidsGame = (function(self) {
     self.startNewGame = function() {
         self.score = 0;
         self.gameActive = true;
-        self.objects.loadAliens(10);
-        self.objects.loadAsteroids(20);
-        self.objects.ship.setPosition({ x: self.graphics.canvas.width/2, y: self.graphics.canvas.height/2 });
-        //intialize load asteroids and aliens
+        self.objects.loadShip();
+        advanceLevel();
+
         startTimeStamp = lastTimeStamp = performance.now();
 		requestAnimationFrame(gameLoop);
     };
@@ -60,7 +59,7 @@ var AsteroidsGame = (function(self) {
     };
 
     self.shootLaser = function(elapsedTime) {
-        //TODO: implement shooting system
+        self.objects.loadLaserShot(lastTimeStamp);
     };
 
     function gameLoop(timestamp) {
@@ -68,43 +67,74 @@ var AsteroidsGame = (function(self) {
             return;
         }
 
-        var elapsedTime = lastTimeStamp - timestamp;
+        var elapsedTime = timestamp - lastTimeStamp;
         lastTimeStamp = timestamp;
         update(elapsedTime);
         render();
 
-		requestAnimationFrame(gameLoop, null);
+		requestAnimationFrame(gameLoop);
 	}
 
     function update(elapsedTime) {
-        self.gameTime = startTimeStamp - lastTimeStamp;
-        
+        self.gameTime = lastTimeStamp - startTimeStamp;
+
+        // handle pressed keys
         self.input.keyBindings.forEach(function(binding) {
             if (self.input.keyPresses.hasOwnProperty(binding.key)) {
                 binding.handler(elapsedTime);
             }
         });
-        
-        self.objects.asteroids.forEach(function(asteroid){
-            asteroid.rotateLeft(elapsedTime);
+
+        // update objects
+        self.objects.ship.update();
+
+        self.objects.asteroids.forEach(function(asteroid) {
             asteroid.moveInInitialDirection(elapsedTime);
+            asteroid.rotateLeft(elapsedTime);
+            asteroid.update();
         });
 
         self.objects.aliens.forEach(function(alien){
            alien.moveInInitialDirection(elapsedTime);
         });
+
+        var expiredShots = [];
+        self.objects.laserShots.forEach(function(shot) {
+            if (lastTimeStamp - shot.timestamp >= shot.lifespan) {
+                expiredShots.push(shot);
+            }
+            shot.moveInInitialDirection(elapsedTime);
+            shot.update();
+        });
+        expiredShots.forEach(function(shot) {
+            self.objects.laserShots.splice(self.objects.laserShots.indexOf(shot), 1);
+        });
+
+        // check game status
+        if (self.objects.asteroids.length === 0) {
+            self.objects.loadAsteroids(self.objects.asteroidsCount + self.level);
+            self.level++;
+        }
     }
 
     function render() {
         self.graphics.clear();
         self.graphics.drawBackground();
-        self.objects.ship.render();
-        self.objects.aliens.forEach(function(alien){
-           alien.render();
-        });
         self.objects.asteroids.forEach(function(asteroid){
             asteroid.render();
         });
+        self.objects.aliens.forEach(function(alien){
+           alien.render();
+        });
+        self.objects.laserShots.forEach(function(shot){
+            shot.render();
+        });
+        self.objects.ship.render();
+    }
+
+    function advanceLevel() {
+        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level, self.objects.asteroidTypes.big);
+        self.level++;
     }
 
     return self;

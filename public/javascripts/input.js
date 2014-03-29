@@ -15,7 +15,7 @@ AsteroidsGame.input = (function(self) {
         registerKeyBinding(keyCodes.right, AsteroidsGame.rotateShipRight);
         registerKeyBinding(keyCodes.hyperspace, AsteroidsGame.enterHyperspace);
         registerKeyBinding(keyCodes.shoot, AsteroidsGame.shootLaser);
-    }
+    };
 
     self.getKeyName = function(keyCode) {
         return KeyEvent.getKeyByValue(keyCode).split("VK_").pop();
@@ -26,7 +26,7 @@ AsteroidsGame.input = (function(self) {
             key: key,
             handler: handler
         });
-    };
+    }
 
     function keyPress(event) {
         var key = (window.Event) ? event.which : event.keyCode;
