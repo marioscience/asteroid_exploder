@@ -197,8 +197,8 @@ AsteroidsGame.objects = (function(self) {
                var particles = particleSystem({
 			            image : AsteroidsGame.graphics.images['images/fire.png'],
                         center: {x: spec.position.x, y: spec.position.y},
-			            speed: {mean: 200, stdev: 25},
-			            lifetime: {mean: 20, stdev: 1}
+			            speed: {mean: 50, stdev: 25},
+			            lifetime: {mean: 5, stdev: 1}
 		            }, AsteroidsGame.graphics );
 
                    /*for(var i = 0; i< 4; i++)
@@ -206,7 +206,7 @@ AsteroidsGame.objects = (function(self) {
                        particles.create();
                    }*/
 
-                   self.activeParticles.push({particle: particles, lifetime: 1000, timealive: 0});
+                   self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
         }
 
         self.astShipCollision = function ()
@@ -215,14 +215,12 @@ AsteroidsGame.objects = (function(self) {
             {
                if(detectTouch(asteroid, self.ship))
                {
-                    //asteroid and ship collided
-                   console.log(" cuidao que se pegan(asteroid y ship)!");
-
-                addParticles(self.ship);
-
+                    addParticles(self.ship);
                }
 
             })
+
+
          };
 
         self.alienShipCollision = function()
@@ -241,6 +239,10 @@ AsteroidsGame.objects = (function(self) {
 
         self.shotCollision = function()
         {
+            var deleteAsters = [];
+            var deleteShots = [];
+            var deleteAlien = [];
+
             self.laserShots.forEach(function(shot)
             {
                 if(shot.shooter == self.ship)
@@ -252,6 +254,8 @@ AsteroidsGame.objects = (function(self) {
                             //explode that asteroid now!
                             console.log("asteroid explosion");
                             addParticles(asteroid);
+                            deleteAsters.push(asteroid);
+                            deleteShots.push(shot);
                         }
                     })
 
@@ -262,6 +266,8 @@ AsteroidsGame.objects = (function(self) {
                             //explode that alien now!
                             console.log("alien explosion!");
                             addParticles(alien);
+                            deleteShots.push(shot);
+                            deleteAlien.push(alien);
                         }
                     })
 
@@ -272,8 +278,24 @@ AsteroidsGame.objects = (function(self) {
                         //shot and ship collided - call explosion function for ship
                         console.log("mayday! we've been hit!");
                         addParticles(self.ship);
+                        deleteShots.push(shot);
                     }
                 }
+            })
+
+            deleteAsters.forEach(function(asteroid)
+            {
+                self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
+            })
+
+            deleteAlien.forEach(function(alien)
+            {
+                self.aliens.splice(self.aliens.indexOf(alien), 1);
+            })
+
+            deleteShots.forEach(function(shot)
+            {
+                self.laserShots.splice(self.laserShots.indexOf(shot), 1);
             })
         }
 

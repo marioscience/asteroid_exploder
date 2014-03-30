@@ -82,7 +82,7 @@ var AsteroidsGame = (function(self) {
         var deleteThese = [];
         self.objects.activeParticles.forEach(function(particle)
         {
-            particle.particle.update(elapsedTime);
+            particle.particle.update(elapsedTime/1000);
             particle.particle.create();
             particle.timealive += elapsedTime;
             //console.log("elapsed: " + elapsedTime);
@@ -97,7 +97,7 @@ var AsteroidsGame = (function(self) {
 
         deleteThese.forEach(function(i)
         {
-            self.objects.activeParticles.splice(i);
+            self.objects.activeParticles.splice(i, 1);
         })
     }
 
