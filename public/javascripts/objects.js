@@ -9,6 +9,7 @@ AsteroidsGame.objects = (function(self) {
     self.aliens = [];
     self.asteroids = [];
     self.laserShots = [];
+    self.activeParticles = [];
     self.asteroidsCount = 5;
 
     self.alienInterval = 20000;
@@ -199,6 +200,23 @@ AsteroidsGame.objects = (function(self) {
                {
                     //asteroid and ship collided
                    console.log(" cuidao que se pegan(asteroid y ship)!");
+
+                   var particles = particleSystem({
+			            image : AsteroidsGame.graphics.images['images/fire.png'],
+                        center: {x: self.ship.position.x, y: self.ship.position.y},
+			            speed: {mean: 200, stdev: 25},
+			            lifetime: {mean: 20, stdev: 1}
+		            }, AsteroidsGame.graphics );
+
+                   /*for(var i = 0; i< 4; i++)
+                   {
+                       particles.create();
+                   }*/
+
+                   self.activeParticles.push(particles);
+
+
+
                }
 
             })

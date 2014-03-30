@@ -48,6 +48,23 @@ AsteroidsGame.graphics = (function(self, $) {
         self.canvas.height = self.canvas.width * 1.3 * height / width;
     }
 
+    //function to be used in the particle system
+     self.drawImage = function(spec) {
+		self.context.save();
+
+		self.context.translate(spec.center.x, spec.center.y);
+		self.context.rotate(spec.rotation);
+		self.context.translate(-spec.center.x, -spec.center.y);
+
+		self.context.drawImage(
+			spec.image,
+			spec.center.x - spec.size/2,
+			spec.center.y - spec.size/2,
+			spec.size, spec.size);
+
+		self.context.restore();
+	}
+
     function bindMenuEvents() {
         self.screens.audio.bind('beforeShow', function () { restoreAudioConfig(); });
         self.screens.keyboard.bind('beforeShow', function () { restoreKeyConfig(); });

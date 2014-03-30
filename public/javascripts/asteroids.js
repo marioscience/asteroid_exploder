@@ -76,6 +76,16 @@ var AsteroidsGame = (function(self) {
 		requestAnimationFrame(gameLoop);
 	}
 
+    function updateParticles(elapsedTime)
+    {
+        self.objects.activeParticles.forEach(function(particle)
+        {
+            particle.update(elapsedTime);
+            particle.create();
+        })
+    }
+
+
     function update(elapsedTime) {
         self.gameTime = lastTimeStamp - startTimeStamp;
 
@@ -90,6 +100,7 @@ var AsteroidsGame = (function(self) {
         updateAsteroids(elapsedTime);
         updateAliens(elapsedTime);
         updateLaserShots(elapsedTime);
+        updateParticles(elapsedTime);
 
         // check game status
         if (self.objects.asteroids.length === 0) {
@@ -112,6 +123,11 @@ var AsteroidsGame = (function(self) {
         self.objects.aliens.forEach(function(alien) {
            alien.render();
         });
+
+        self.objects.activeParticles.forEach(function(particle)
+        {
+            particle.render();
+        })
 
         self.objects.ship.render();
     }
