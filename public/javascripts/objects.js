@@ -191,6 +191,91 @@ AsteroidsGame.objects = (function(self) {
 			graphics.context.restore();
         };
 
+        self.astShipCollision = function ()
+        {
+            self.asteroids.forEach(function(asteroid)
+            {
+               if(detectTouch(asteroid, self.ship))
+               {
+                    //asteroid and ship collided
+                   console.log(" cuidao que se pegan(asteroid y ship)!");
+               }
+
+            })
+         };
+
+        self.alienShipCollision = function()
+        {
+            self.aliens.forEach(function(alien)
+            {
+                if(detectTouch(alien, self.ship))
+               {
+                    //alien and ship collided - call explosion function for ship
+                   console.log("alien y ship se pegaron");
+               }
+            })
+
+          }
+
+        self.shotCollision = function()
+        {
+            self.laserShots.forEach(function(shot)
+            {
+                if(shot.shooter == self.ship)
+                {
+                    self.asteroids.forEach(function(asteroid)
+                    {
+                        if(detectTouch(shot, asteroid))
+                        {
+                            //explode that asteroid now!
+                            console.log("asteroid explosion");
+                        }
+                    })
+
+                    self.aliens .forEach(function(alien)
+                    {
+                         if(detectTouch(shot, asteroid))
+                        {
+                            //explode that alien now!
+                            console.log("alien explosion!");
+                        }
+                    })
+
+                }else
+                {
+                    if(detectTouch(shot, self.ship))
+                    {
+                        //shot and ship collided - call explosion function for ship
+                        console.log("mayday! we've been hit!");
+                    }
+                }
+            })
+        }
+
+
+        function detectTouch(object, element)
+        {
+             var distToOthers = calcDistance(object.position.x,
+             object.position.y,
+             element.position.x,
+             element.position.y);
+             var bothRadius = (element.size.width + element.size.height)/4
+                   + (object.size.width + object.size.height)/4;
+             if(distToOthers <= bothRadius)
+             {
+                   //collition detected in hereeeee mayday! we've been hit!
+                 return true;
+             }else
+             {
+                 return false;
+             }
+        }
+
+        function calcDistance(x1, y1, x2, y2)
+        {
+                return Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1),2)));
+        };
+
         that.update = function() {
             var canvasWidth = graphics.canvas.width;
             var canvasHeight = graphics.canvas.height;

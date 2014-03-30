@@ -127,6 +127,7 @@ var AsteroidsGame = (function(self) {
             self.objects.nextAlienTimestamp = getNextAlienTime();
         }
 
+         self.objects.alienShipCollision();
         // update aliens.
         var expiredAliens = [];
         var alienDestinationOffset = 10;
@@ -157,6 +158,7 @@ var AsteroidsGame = (function(self) {
         self.objects.asteroids.forEach(function(asteroid) {
             asteroid.moveInInitialDirection(elapsedTime);
             asteroid.rotateLeft(elapsedTime);
+            self.objects.astShipCollision();
             asteroid.update();
         });
     }
@@ -170,6 +172,9 @@ var AsteroidsGame = (function(self) {
             shot.moveInInitialDirection(elapsedTime);
             shot.update();
         });
+
+        self.objects.shotCollision();
+
         expiredShots.forEach(function(shot) {
             self.objects.laserShots.splice(self.objects.laserShots.indexOf(shot), 1);
         });
