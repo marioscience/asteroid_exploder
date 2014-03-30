@@ -78,10 +78,26 @@ var AsteroidsGame = (function(self) {
 
     function updateParticles(elapsedTime)
     {
+        var count = 0;
+        var deleteThese = [];
         self.objects.activeParticles.forEach(function(particle)
         {
-            particle.update(elapsedTime);
-            particle.create();
+            particle.particle.update(elapsedTime);
+            particle.particle.create();
+            particle.timealive += elapsedTime;
+            //console.log("elapsed: " + elapsedTime);
+
+            if(particle.timealive > particle.lifetime)
+            {
+                deleteThese.push(count);
+            }
+
+            count++;
+        })
+
+        deleteThese.forEach(function(i)
+        {
+            self.objects.activeParticles.splice(i);
         })
     }
 
@@ -126,7 +142,7 @@ var AsteroidsGame = (function(self) {
 
         self.objects.activeParticles.forEach(function(particle)
         {
-            particle.render();
+            particle.particle.render();
         })
 
         self.objects.ship.render();
