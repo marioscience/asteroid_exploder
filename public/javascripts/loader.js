@@ -22,7 +22,7 @@ window.addEventListener('load', function() {
                 'preload!images/background.png',
                 'preload!images/assassin_ship.png',
                 'preload!images/asteroid_big1.png',
-                'preload!images/planet_1.png',
+                'preload!images/alien.png',
                 'preload!images/laser_shot.png',
 
                 'preload!audio/click.wav',
@@ -123,31 +123,37 @@ function debounce(func, wait, immediate) {
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement, fromIndex) {
-      if ( this === undefined || this === null ) {
-        throw new TypeError( '"this" is null or not defined' );
-      }
+        if ( this === undefined || this === null ) {
+            throw new TypeError( '"this" is null or not defined' );
+        }
 
-      var length = this.length >>> 0; // Hack to convert object.length to a UInt32
+        var length = this.length >>> 0; // Hack to convert object.length to a UInt32
 
-      fromIndex = +fromIndex || 0;
+        fromIndex = +fromIndex || 0;
 
-      if (Math.abs(fromIndex) === Infinity) {
-        fromIndex = 0;
-      }
+        if (Math.abs(fromIndex) === Infinity) {
+            fromIndex = 0;
+        }
 
-      if (fromIndex < 0) {
-        fromIndex += length;
         if (fromIndex < 0) {
-          fromIndex = 0;
+            fromIndex += length;
+            if (fromIndex < 0) {
+              fromIndex = 0;
+            }
         }
-      }
 
-      for (;fromIndex < length; fromIndex++) {
-        if (this[fromIndex] === searchElement) {
-          return fromIndex;
+        for (;fromIndex < length; fromIndex++) {
+            if (this[fromIndex] === searchElement) {
+              return fromIndex;
+            }
         }
-      }
 
-      return -1;
+        return -1;
     };
-  }
+}
+
+if (!Math.sign) {
+    Math.sign = function(number) {
+        return (number)? ((number < 0)? -1: 1): 0;
+    };
+}

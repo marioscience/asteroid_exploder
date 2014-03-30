@@ -11,18 +11,20 @@ AsteroidsGame.objects = (function(self) {
     self.laserShots = [];
     self.asteroidsCount = 5;
 
-    var laserThrottle = 200;
-    var lastShotTimestamp = 0;
+    self.alienInterval = 20000;
+    self.nextAlienTimestamp = 0;
+    self.lastAlienTimestamp = 0;
 
+    var laserSpeedLimit = 3;
     var graphics = AsteroidsGame.graphics;
     var shipImage = graphics.images['images/assassin_ship.png'];
     var asteroidImage = graphics.images['images/asteroid_big1.png'];
-    var alienImage = graphics.images['images/planet_1.png'];
+    var alienImage = graphics.images['images/alien.png'];
     var laserImage = graphics.images['images/laser_shot.png'];
 
-    var alienTypes = {
-        big: { size: 15 },
-        small: { size: 5 }
+    self.alienTypes = {
+        big: { size: 25 },
+        small: { size: 15 }
     };
 
     self.asteroidTypes = {
@@ -46,58 +48,72 @@ AsteroidsGame.objects = (function(self) {
             maxSpeed: 3,
             angle: 60,
             acceleration: 2,
-            frictionFactor: .999
+            frictionFactor: .997,
+            lastShotTimestamp: 0,
+            laserThrottle: 200
         });
     };
 
-    self.loadLaserShot = function(timestamp) {
-        if (timestamp - lastShotTimestamp < laserThrottle) {
+    self.loadLaserShot = function(timestamp, shooter, angle) {
+        if (timestamp - shooter.lastShotTimestamp < shooter.laserThrottle) {
             return;
         }
 
-        var xComponent = Math.sin(this.ship.angle * Math.PI / 180);
-        var yComponent = Math.cos(this.ship.angle * Math.PI / 180);
+        var xComponent = Math.sin(angle * Math.PI / 180);
+        var yComponent = Math.cos(angle * Math.PI / 180);
 
         var width = 2;
         var height = width * laserImage.height / laserImage.width + 5;
 
-        var shot = Texture({
+        self.laserShots.push(Texture({
             image: laserImage,
-            position: { x: this.ship.position.x, y: this.ship.position.y },
+            position: { x: shooter.position.x, y: shooter.position.y },
             size: { width: width, height: height },
-            speed: { x: xComponent * this.ship.maxSpeed, y: yComponent * this.ship.maxSpeed },
+            speed: { x: 2 * xComponent * laserSpeedLimit, y: 2 * yComponent * laserSpeedLimit },
             angularSpeed: 0,
-            maxSpeed: 10,
-            angle: this.ship.angle,
+            maxSpeed: laserSpeedLimit,
+            angle: angle,
             timestamp: timestamp,
             lifespan: 1000,
             acceleration: 5,
+            shooter: shooter,
             frictionFactor: 1
-        });
+        }));
 
-        lastShotTimestamp = timestamp;
-        self.laserShots.push(shot);
+        shooter.lastShotTimestamp = timestamp;
     };
 
-    self.loadAliens = function(amount) {
-        //TODO: refactor this
-        while (--amount) {
-            var side = Math.floor((Math.random()*2)+1);
-            var size = Math.floor((Math.random()*5)+0);
-            var alienArr = [{ size: 40 }, { size: 5 }, { size: 40 }, { size: 5 }, { size: 40 }, { size: 40 }];
-            var alienType = alienTypes.big; // determine alien type randomly and whatnot.
-            var alien = Texture({
-                image: alienImage,
-                position: { x: (side == 1)?  0 :  graphics.canvas.width, y: Math.floor(Math.random()*graphics.canvas.width) }, // en un edge del canvas, 'y' es random
-                size: { width: alienArr[size].size, height: alienArr[size].size * alienImage.height / alienImage.width }, // en vez de 20, el alienType.size
-                rotateRate: 0, // FUCKING ALIENS! YOU GET NOTHING! ----> 0
-                speed: Random.nextGaussian(20, 10), // la veldadera velocida de la lu lucina.
-                angle: (side == 1)? Math.floor((Math.random()*135)+10) : -(Math.floor((Math.random()*135)+10)) // una direccion random, preferiblemente opuesta a la esquina en que salio.
-            });
-            alien.type = alienType;
+    self.loadAlien = function(timestamp) {
+        var alienType = [self.alienTypes.big, self.alienTypes.small, self.alienTypes.big]
+            .splice(Random.nextRange(0, 3), 1)
+            .pop();
 
-            self.aliens.push(alien);
-        }
+        var width = alienType.size;
+        var height = width * asteroidImage.height / asteroidImage.width;
+
+        var sides = [{ x: 0, angle: 90 }, { x: graphics.canvas.width, angle: 270 }];
+        var yPosition = Random.nextRange(0, graphics.canvas.height);
+        var startSide = sides.splice(Random.nextRange(0,1), 1).pop();
+        var endSide = sides.pop().x;
+
+        self.aliens.push(Texture({
+            image: alienImage,
+            position: { x: startSide.x, y: yPosition },
+            size: { width: width, height: height },
+            speed: { x: 0, y: 0 },
+            angularSpeed: 0,
+            maxSpeed: 2,
+            angle: startSide.angle,
+            acceleration: 2,
+            type: alienType,
+            frictionFactor: 0.98,
+            destination: endSide,
+            lastShotTimestamp: 0,
+            laserThrottle: 2000
+        }));
+
+        self.lastAlienTimestamp = timestamp;
+
     };
 
     self.loadAsteroids = function(amount, asteroidType) {
@@ -116,7 +132,7 @@ AsteroidsGame.objects = (function(self) {
             var xPosition = [range.left, range.right].splice(Random.nextRange(0, 1), 1).pop();
             var yPosition = [range.up, range.down].splice(Random.nextRange(0, 1), 1).pop();
 
-            var asteroid = Texture({
+            self.asteroids.push(Texture({
                 image: asteroidImage,
                 position: { x: xPosition, y: yPosition },
                 size: { width: width, height: height },
@@ -127,11 +143,7 @@ AsteroidsGame.objects = (function(self) {
                 maxSpeed: 1.5,
                 type: asteroidType,
                 frictionFactor: 1
-
-                //TODO: consider adding a 'destroyed' attribute to stop rendering it and activate particle system for a couple of seconds.
-            });
-
-            self.asteroids.push(asteroid);
+            }));
         }
     };
 
@@ -157,6 +169,10 @@ AsteroidsGame.objects = (function(self) {
         that.moveInInitialDirection = function(elapsedTime) {
             move(elapsedTime, that.initialAngle);
         };
+
+        that.moveInAngle = function(angle, elapsedTime) {
+            move(elapsedTime, angle);
+        }
 
         that.render = function() {
             graphics.context.save();
@@ -199,8 +215,8 @@ AsteroidsGame.objects = (function(self) {
 
             var overSpeed = Math.sqrt(Math.pow(that.speed.y, 2) + Math.pow(that.speed.x, 2)) > that.maxSpeed;
 
-            that.speed.x = (overSpeed)? that.maxSpeed * xComponent: that.speed.x + dx;
-            that.speed.y = (overSpeed)? that.maxSpeed * yComponent: that.speed.y + dy;
+            that.speed.x = (overSpeed)? that.speed.x: that.speed.x + dx;
+            that.speed.y = (overSpeed)? that.speed.y: that.speed.y + dy;
         }
 
         return that;
