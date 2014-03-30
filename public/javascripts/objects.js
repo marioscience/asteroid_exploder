@@ -85,7 +85,7 @@ AsteroidsGame.objects = (function(self) {
 
     self.loadAlien = function(timestamp) {
         var alienType = [self.alienTypes.big, self.alienTypes.small, self.alienTypes.big]
-            .splice(Random.nextRange(0, 3), 1)
+            .splice(Random.nextRange(0, 2), 1)
             .pop();
 
         var width = alienType.size;
