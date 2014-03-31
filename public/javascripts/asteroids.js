@@ -120,8 +120,7 @@ var AsteroidsGame = (function(self) {
 
         // check game status
         if (self.objects.asteroids.length === 0) {
-            self.objects.loadAsteroids(self.objects.asteroidsCount + self.level);
-            self.level++;
+            advanceLevel();
         }
     }
 
@@ -143,7 +142,7 @@ var AsteroidsGame = (function(self) {
         self.objects.activeParticles.forEach(function(particle)
         {
             particle.particle.render();
-        })
+        });
 
         self.objects.ship.render();
     }

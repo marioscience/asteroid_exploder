@@ -1,7 +1,6 @@
 /**
  * Created by jcaraballo17.
  */
-
 AsteroidsGame.objects = (function(self) {
     "use strict";
 
@@ -235,7 +234,7 @@ AsteroidsGame.objects = (function(self) {
                }
             })
 
-          }
+          };
 
         self.shotCollision = function()
         {
@@ -271,7 +270,8 @@ AsteroidsGame.objects = (function(self) {
                         }
                     })
 
-                }else
+                }
+                else
                 {
                     if(detectTouch(shot, self.ship))
                     {
@@ -297,7 +297,7 @@ AsteroidsGame.objects = (function(self) {
             {
                 self.laserShots.splice(self.laserShots.indexOf(shot), 1);
             })
-        }
+        };
 
 
         function detectTouch(object, element)
@@ -321,7 +321,7 @@ AsteroidsGame.objects = (function(self) {
         function calcDistance(x1, y1, x2, y2)
         {
                 return Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1),2)));
-        };
+        }
 
         that.update = function() {
             var canvasWidth = graphics.canvas.width;
