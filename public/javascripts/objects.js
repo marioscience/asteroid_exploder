@@ -10,7 +10,7 @@ AsteroidsGame.objects = (function(self) {
     self.asteroids = [];
     self.laserShots = [];
     self.activeParticles = [];
-    self.asteroidsCount = 5;
+    self.asteroidsCount = 3;
 
     self.alienInterval = 20000;
     self.nextAlienTimestamp = 0;
@@ -33,6 +33,8 @@ AsteroidsGame.objects = (function(self) {
         medium: { size: 35 },
         small: { size: 20 }
     };
+    self.asteroidTypes.big.split = { type: self.asteroidTypes.medium, amount: 3 };
+    self.asteroidTypes.medium.split = { type: self.asteroidTypes.small, amount: 4 };
 
     self.loadShip = function(newX, newY) {
         var width = 20;
@@ -118,7 +120,7 @@ AsteroidsGame.objects = (function(self) {
         self.lastAlienTimestamp = timestamp;
     };
 
-    self.loadAsteroids = function(amount, asteroidType) {
+    self.loadAsteroids = function(amount, asteroidType, position) {
         var width = asteroidType.size;
         var height = width * asteroidImage.height / asteroidImage.width;
         var offset = { x: graphics.canvas.width * 0.15 / 2, y: graphics.canvas.height * 0.15 / 2 };
@@ -131,8 +133,8 @@ AsteroidsGame.objects = (function(self) {
                 down: Random.nextRange(self.ship.position.y + offset.y, graphics.canvas.height)
             };
 
-            var xPosition = [range.left, range.right].splice(Random.nextRange(0, 1), 1).pop();
-            var yPosition = [range.up, range.down].splice(Random.nextRange(0, 1), 1).pop();
+            var xPosition = (position)? position.x: [range.left, range.right].splice(Random.nextRange(0, 1), 1).pop();
+            var yPosition = (position)? position.y: [range.up, range.down].splice(Random.nextRange(0, 1), 1).pop();
 
             self.asteroids.push(Texture({
                 image: asteroidImage,
@@ -148,6 +150,14 @@ AsteroidsGame.objects = (function(self) {
             }));
         }
     };
+
+    function splitAsteroid(asteroid) {
+        var split = asteroid.type.split;
+        if (!split) {
+            return;
+        }
+        self.loadAsteroids(split.amount, split.type, asteroid.position);
+    }
 
     function addParticles(spec) {
        var particles = particleSystem({
