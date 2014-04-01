@@ -8,6 +8,7 @@ var AsteroidsGame = (function(self) {
     self.gameActive = false;
     self.gameTime = 0;
     self.score = 0;
+    self.lives = 3;
     self.level = 0;
 
     var startTimeStamp = 0;
@@ -142,7 +143,7 @@ var AsteroidsGame = (function(self) {
         self.objects.activeParticles.forEach(function(particle)
         {
             particle.particle.render();
-        });
+        })
 
         self.objects.ship.render();
     }
@@ -212,7 +213,7 @@ var AsteroidsGame = (function(self) {
     }
 
     function advanceLevel() {
-        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level, self.objects.asteroidTypes.big);
+        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level + 20/*deleete*/, self.objects.asteroidTypes.big);
         self.level++;
     }
 

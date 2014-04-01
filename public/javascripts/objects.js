@@ -1,6 +1,7 @@
 /**
  * Created by jcaraballo17.
  */
+
 AsteroidsGame.objects = (function(self) {
     "use strict";
 
@@ -33,7 +34,7 @@ AsteroidsGame.objects = (function(self) {
         small: { size: 5 }
     };
 
-    self.loadShip = function() {
+    self.loadShip = function(newX, newY) {
         var width = 20;
         var height = width * shipImage.height / shipImage.width;
         var initialX = graphics.canvas.width / 2;
@@ -41,7 +42,7 @@ AsteroidsGame.objects = (function(self) {
 
         self.ship = Texture({
             image: shipImage,
-            position: { x: initialX, y: initialY },
+            position: { x: newX || initialX, y: newY || initialY },
             size: { width: width, height: height },
             speed: { x: 0, y: 0 },
             angularSpeed: 300,
@@ -208,33 +209,71 @@ AsteroidsGame.objects = (function(self) {
                    self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
         }
 
-        self.astShipCollision = function ()
+        self.astShipCollision = function (adding)
         {
+            adding = adding || false;
+            var detected = false;
             self.asteroids.forEach(function(asteroid)
             {
                if(detectTouch(asteroid, self.ship))
                {
-                    addParticles(self.ship);
+                    if(!adding)
+                    {
+                        addParticles(self.ship);
+                        newShip();
+                    }
+
+                   detected = true;
                }
 
             })
 
-
+            return detected;
          };
 
-        self.alienShipCollision = function()
+        self.alienShipCollision = function(adding)
         {
+            adding = adding || false;
+            var detected = false;
             self.aliens.forEach(function(alien)
             {
                 if(detectTouch(alien, self.ship))
                {
                     //alien and ship collided - call explosion function for ship
-                   console.log("alien y ship se pegaron");
-                   addParticles(self.ship);
+                   if(!adding)
+                   {
+                        addParticles(self.ship);
+                        newShip();
+                   }
+                   detected = true;
                }
             })
+            return detected;
+          }
 
-          };
+        function newShip()
+        {
+            var COLL_FACTOR = 12;
+            self.ship = {};
+            self.loadShip();
+
+            self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
+            self.ship.size.height *= COLL_FACTOR;
+
+            while(self.astShipCollision(true) || self.alienShipCollision(true))
+            {
+                self.ship = {};
+                var randX = Random.nextRange(10, graphics.canvas.width-10);
+                var randY = Random.nextRange(10, graphics.canvas.height-10);
+
+                self.loadShip(randX, randY);
+                self.ship.size.width *= COLL_FACTOR;
+                self.ship.size.height *= COLL_FACTOR;
+            }
+
+            self.ship.size.width /= COLL_FACTOR;
+            self.ship.size.height /= COLL_FACTOR;
+        }
 
         self.shotCollision = function()
         {
@@ -270,8 +309,7 @@ AsteroidsGame.objects = (function(self) {
                         }
                     })
 
-                }
-                else
+                }else
                 {
                     if(detectTouch(shot, self.ship))
                     {
@@ -279,6 +317,7 @@ AsteroidsGame.objects = (function(self) {
                         console.log("mayday! we've been hit!");
                         addParticles(self.ship);
                         deleteShots.push(shot);
+                        newShip();
                     }
                 }
             })
@@ -297,7 +336,7 @@ AsteroidsGame.objects = (function(self) {
             {
                 self.laserShots.splice(self.laserShots.indexOf(shot), 1);
             })
-        };
+        }
 
 
         function detectTouch(object, element)
@@ -321,7 +360,7 @@ AsteroidsGame.objects = (function(self) {
         function calcDistance(x1, y1, x2, y2)
         {
                 return Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1),2)));
-        }
+        };
 
         that.update = function() {
             var canvasWidth = graphics.canvas.width;
