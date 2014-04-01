@@ -6,6 +6,11 @@ var AsteroidsGame = (function(self) {
     "use strict";
 
     self.gameActive = false;
+    self.gameOver = false;
+
+    self.gameModes = { player: {}, pc: {}};
+    self.currentMode = {};
+
     self.gameTime = 0;
     self.score = 0;
     self.lives = 3;
@@ -24,15 +29,18 @@ var AsteroidsGame = (function(self) {
         self.input.updateKeyBindings();
     };
 
-    self.startAttractMode = function() {
+    self.startAttractGame = function() {
         //TODO: develop ai for attract mode
+        self.currentMode = self.gameModes.pc;
     };
 
     self.startNewGame = function() {
         self.score = 0;
+        self.gameOver = false;
         self.gameActive = true;
-        self.objects.loadShip();
+        self.currentMode = self.gameModes.player;
         self.objects.nextAlienTimestamp = getNextAlienTime();
+        self.objects.loadShip();
         advanceLevel();
 
         startTimeStamp = lastTimeStamp = performance.now();
@@ -99,7 +107,7 @@ var AsteroidsGame = (function(self) {
             }
 
             count++;
-        })
+        });
 
         deleteThese.forEach(function(i)
         {
@@ -110,6 +118,17 @@ var AsteroidsGame = (function(self) {
 
     function update(elapsedTime) {
         self.gameTime = lastTimeStamp - startTimeStamp;
+
+        // check game status
+        if (self.lives === 0) {
+
+            return;
+        }
+
+        if (self.objects.asteroids.length === 0) {
+            advanceLevel();
+        }
+
 
         // handle pressed keys
         self.input.keyBindings.forEach(function(binding) {
@@ -123,34 +142,21 @@ var AsteroidsGame = (function(self) {
         updateAliens(elapsedTime);
         updateLaserShots(elapsedTime);
         updateParticles(elapsedTime);
-
-        // check game status
-        if (self.objects.asteroids.length === 0) {
-            advanceLevel();
-        }
     }
 
     function render() {
         self.graphics.clear();
         self.graphics.drawBackground();
-        self.objects.asteroids.forEach(function(asteroid) {
-            asteroid.render();
-        });
-
-        self.objects.laserShots.forEach(function(shot) {
-            shot.render();
-        });
-
-        self.objects.aliens.forEach(function(alien) {
-           alien.render();
-        });
-
-        self.objects.activeParticles.forEach(function(particle)
-        {
-            particle.particle.render();
-        })
-
+        self.objects.asteroids.forEach(function(asteroid) { asteroid.render(); });
+        self.objects.laserShots.forEach(function(shot) { shot.render(); });
+        self.objects.aliens.forEach(function(alien) { alien.render(); });
+        self.objects.activeParticles.forEach(function(particle) { particle.particle.render(); });
         self.objects.ship.render();
+        if (self.currentMode === self.gameModes.player) {
+            self.graphics.drawScore();
+            self.graphics.drawLevel();
+            self.graphics.drawLives();
+        }
     }
 
     function updateShip() {

@@ -85,7 +85,6 @@ AsteroidsGame.objects = (function(self) {
 
         AsteroidsGame.audio.playLaserFx();
         shooter.lastShotTimestamp = timestamp;
-
     };
 
     self.loadAlien = function(timestamp) {
@@ -150,50 +149,6 @@ AsteroidsGame.objects = (function(self) {
             }));
         }
     };
-
-    function splitAsteroid(asteroid) {
-        var split = asteroid.type.split;
-        if (!split) {
-            return;
-        }
-        self.loadAsteroids(split.amount, split.type, asteroid.position);
-    }
-
-    function addParticles(spec) {
-       var particles = particleSystem({
-            image : AsteroidsGame.graphics.images['images/fire.png'],
-            center: {x: spec.position.x, y: spec.position.y},
-            speed: {mean: 50, stdev: 25},
-            lifetime: {mean: 5, stdev: 1}
-        }, AsteroidsGame.graphics );
-
-       self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
-    }
-
-    function newShip()
-    {
-        AsteroidsGame.audio.playShipExplosionFx();
-        var COLL_FACTOR = 12;
-        //self.ship = {};
-        self.loadShip();
-
-        self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
-        self.ship.size.height *= COLL_FACTOR;
-
-        while(self.astShipCollision(true) || self.alienShipCollision(true))
-        {
-            self.ship = {};
-            var randX = Random.nextRange(10, graphics.canvas.width-10);
-            var randY = Random.nextRange(10, graphics.canvas.height-10);
-
-            self.loadShip(randX, randY);
-            self.ship.size.width *= COLL_FACTOR;
-            self.ship.size.height *= COLL_FACTOR;
-        }
-
-        self.ship.size.width /= COLL_FACTOR;
-        self.ship.size.height /= COLL_FACTOR;
-    }
 
     self.astShipCollision = function (adding)
     {
@@ -301,6 +256,51 @@ AsteroidsGame.objects = (function(self) {
             self.laserShots.splice(self.laserShots.indexOf(shot), 1);
         });
     };
+
+    function splitAsteroid(asteroid) {
+        var split = asteroid.type.split;
+        if (!split) {
+            return;
+        }
+        self.loadAsteroids(split.amount, split.type, asteroid.position);
+    }
+
+    function addParticles(spec) {
+       var particles = particleSystem({
+            image : AsteroidsGame.graphics.images['images/fire.png'],
+            center: {x: spec.position.x, y: spec.position.y},
+            speed: {mean: 50, stdev: 25},
+            lifetime: {mean: 5, stdev: 1}
+        }, AsteroidsGame.graphics );
+
+       self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
+    }
+
+    function newShip()
+    {
+        AsteroidsGame.audio.playShipExplosionFx();
+
+        var COLL_FACTOR = 12;
+        self.ship = {};
+        self.loadShip();
+
+        self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
+        self.ship.size.height *= COLL_FACTOR;
+
+        while(self.astShipCollision(true) || self.alienShipCollision(true))
+        {
+            self.ship = {};
+            var randX = Random.nextRange(10, graphics.canvas.width-10);
+            var randY = Random.nextRange(10, graphics.canvas.height-10);
+
+            self.loadShip(randX, randY);
+            self.ship.size.width *= COLL_FACTOR;
+            self.ship.size.height *= COLL_FACTOR;
+        }
+
+        self.ship.size.width /= COLL_FACTOR;
+        self.ship.size.height /= COLL_FACTOR;
+    }
 
 
     function detectTouch(object, element) {

@@ -20,6 +20,12 @@ AsteroidsGame.graphics = (function(self, $) {
     };
 
     var screenStack = [];
+    var livesImageSize = 18;
+    var scoreOffset = { x: 45, y: 35 };
+    var levelOffset = { x: 70, y: 20 };
+    var livesOffset = { x: scoreOffset.x - livesImageSize / 4, y: scoreOffset.y + 15 };
+
+
 
     self.initializeInterface = function() {
         bindMenuEvents();
@@ -41,15 +47,41 @@ AsteroidsGame.graphics = (function(self, $) {
         self.context.drawImage(background, 0, 0, self.canvas.width, self.canvas.height);
     };
 
-    function resizeCanvas() {
-        var width = $(window).width();
-        var height = $(window).height();
-        self.canvas.width = width * 0.667;
-        self.canvas.height = self.canvas.width * 1.3 * height / width;
-    }
+    self.drawLevel = function() {
+        var level = "Level " + AsteroidsGame.level;
+        self.context.fillStyle = '#ffffff';
+        self.context.textAlign = 'center';
+        self.context.font = 'normal 16pt Hyperspace';
+        self.context.fillText(level, self.canvas.width - levelOffset.x, self.canvas.height - levelOffset.y);
+    };
 
-    //function to be used in the particle system
-     self.drawImage = function(spec) {
+    self.drawScore = function() {
+        var currentScore = "" + AsteroidsGame.score;
+
+        self.context.textAlign = 'left';
+        self.context.font = 'normal 16pt Hyperspace';
+        self.context.fillText(currentScore, scoreOffset.x, scoreOffset.y);
+    };
+
+    self.drawLives = function() {
+        var livesAmount = AsteroidsGame.lives;
+        var livesImage = self.images['images/assassin_ship.png'];
+
+        self.context.textAlign = 'left';
+        self.context.fillStyle = '#ffffff';
+        self.context.font = 'normal 16pt Hyperspace';
+
+        while (livesAmount--) {
+            //self.context.fillText('V', livesOffset.x + 25 * livesAmount, livesOffset.y);
+            self.context.drawImage(
+                livesImage,
+                livesOffset.x + livesImageSize * livesAmount, livesOffset.y,
+                livesImageSize, livesImageSize * livesImage.height / livesImage.width
+            );
+        }
+    };
+
+    self.drawImage = function(spec) {
 		self.context.save();
 
 		self.context.translate(spec.center.x, spec.center.y);
@@ -63,7 +95,14 @@ AsteroidsGame.graphics = (function(self, $) {
 			spec.size, spec.size);
 
 		self.context.restore();
-	}
+	};
+
+    function resizeCanvas() {
+        var width = $(window).width();
+        var height = $(window).height();
+        self.canvas.width = width * 0.667;
+        self.canvas.height = self.canvas.width * 1.3 * height / width;
+    }
 
     function bindMenuEvents() {
         self.screens.audio.bind('beforeShow', function () { restoreAudioConfig(); });
