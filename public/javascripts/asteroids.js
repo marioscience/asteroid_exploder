@@ -16,6 +16,10 @@ var AsteroidsGame = (function(self) {
 
     self.initialize = function() {
         self.configuration.loadConfigurations();
+        self.audio.bindScreenSounds({ menuScreen: self.graphics.screens.menu,
+            gameScreen: self.graphics.screens.game,
+            menuItems: $('.menu-item')
+        });
         self.graphics.initializeInterface();
         self.input.updateKeyBindings();
     };
@@ -46,6 +50,7 @@ var AsteroidsGame = (function(self) {
 
     self.moveShip = function(elapsedTime) {
         self.objects.ship.moveForward(elapsedTime);
+        self.audio.playThrustFx();
     };
 
     self.rotateShipRight = function(elapsedTime) {
@@ -213,7 +218,7 @@ var AsteroidsGame = (function(self) {
     }
 
     function advanceLevel() {
-        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level + 20/*deleete*/, self.objects.asteroidTypes.big);
+        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level, self.objects.asteroidTypes.big);
         self.level++;
     }
 

@@ -45,4 +45,4 @@ AsteroidsGame.configuration = (function(self) {
     };
 
     return self;
-}(AsteroidsGame.audio || {}));
+}(AsteroidsGame.configuration || {}));

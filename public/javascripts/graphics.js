@@ -150,8 +150,8 @@ AsteroidsGame.graphics = (function(self, $) {
 
     function retrieveAudioConfig() {
         return {
-            musicVolume: $('#sliderMusic').val(),
-            fxVolume: $('#sliderFx').val()
+            musicVolume: +$('#sliderMusic').val(),
+            fxVolume: +$('#sliderFx').val()
         };
     }
 

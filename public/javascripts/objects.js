@@ -29,9 +29,9 @@ AsteroidsGame.objects = (function(self) {
     };
 
     self.asteroidTypes = {
-        big: { size: 40 },
-        medium: { size: 25 },
-        small: { size: 5 }
+        big: { size: 50 },
+        medium: { size: 35 },
+        small: { size: 20 }
     };
 
     self.loadShip = function(newX, newY) {
@@ -81,7 +81,9 @@ AsteroidsGame.objects = (function(self) {
             frictionFactor: 1
         }));
 
+        AsteroidsGame.audio.playLaserFx();
         shooter.lastShotTimestamp = timestamp;
+
     };
 
     self.loadAlien = function(timestamp) {
@@ -114,7 +116,6 @@ AsteroidsGame.objects = (function(self) {
         }));
 
         self.lastAlienTimestamp = timestamp;
-
     };
 
     self.loadAsteroids = function(amount, asteroidType) {
@@ -122,7 +123,7 @@ AsteroidsGame.objects = (function(self) {
         var height = width * asteroidImage.height / asteroidImage.width;
         var offset = { x: graphics.canvas.width * 0.15 / 2, y: graphics.canvas.height * 0.15 / 2 };
 
-        while (--amount) {
+        while (amount--) {
             var range = {
                 left: Random.nextRange(0, self.ship.position.x - offset.x),
                 right: Random.nextRange(self.ship.position.x + offset.x, graphics.canvas.width),
@@ -147,6 +148,165 @@ AsteroidsGame.objects = (function(self) {
             }));
         }
     };
+
+    function addParticles(spec) {
+       var particles = particleSystem({
+            image : AsteroidsGame.graphics.images['images/fire.png'],
+            center: {x: spec.position.x, y: spec.position.y},
+            speed: {mean: 50, stdev: 25},
+            lifetime: {mean: 5, stdev: 1}
+        }, AsteroidsGame.graphics );
+
+       self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
+    }
+
+    function newShip()
+    {
+        AsteroidsGame.audio.playShipExplosionFx();
+        var COLL_FACTOR = 12;
+        //self.ship = {};
+        self.loadShip();
+
+        self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
+        self.ship.size.height *= COLL_FACTOR;
+
+        while(self.astShipCollision(true) || self.alienShipCollision(true))
+        {
+            self.ship = {};
+            var randX = Random.nextRange(10, graphics.canvas.width-10);
+            var randY = Random.nextRange(10, graphics.canvas.height-10);
+
+            self.loadShip(randX, randY);
+            self.ship.size.width *= COLL_FACTOR;
+            self.ship.size.height *= COLL_FACTOR;
+        }
+
+        self.ship.size.width /= COLL_FACTOR;
+        self.ship.size.height /= COLL_FACTOR;
+    }
+
+    self.astShipCollision = function (adding)
+    {
+        adding = adding || false;
+        var detected = false;
+        self.asteroids.forEach(function(asteroid)
+        {
+           if(detectTouch(asteroid, self.ship))
+           {
+
+               if(!adding)
+               {
+                   addParticles(self.ship);
+                   newShip();
+               }
+               detected = true;
+           }
+        });
+
+        return detected;
+     };
+
+    self.alienShipCollision = function(adding) {
+        adding = adding || false;
+        var detected = false;
+        self.aliens.forEach(function(alien) {
+            if(detectTouch(alien, self.ship))
+           {
+                //alien and ship collided - call explosion function for ship
+               if(!adding)
+               {
+                    addParticles(self.ship);
+                    newShip();
+               }
+               detected = true;
+           }
+        });
+        return detected;
+      };
+
+
+
+    self.shotCollision = function()
+    {
+        var deleteAsters = [];
+        var deleteShots = [];
+        var deleteAlien = [];
+
+        self.laserShots.forEach(function(shot)
+        {
+            if(shot.shooter == self.ship)
+            {
+                self.asteroids.forEach(function(asteroid)
+                {
+                    if(detectTouch(shot, asteroid))
+                    {
+                        //explode that asteroid now!
+                        console.log("asteroid explosion");
+                        addParticles(asteroid);
+                        deleteAsters.push(asteroid);
+                        deleteShots.push(shot);
+                    }
+                });
+
+                self.aliens .forEach(function(alien)
+                {
+                     if(detectTouch(shot, alien))
+                    {
+                        //explode that alien now!
+                        console.log("alien explosion!");
+                        addParticles(alien);
+                        deleteShots.push(shot);
+                        deleteAlien.push(alien);
+                    }
+                })
+
+            }else
+            {
+                if(detectTouch(shot, self.ship))
+                {
+                    //shot and ship collided - call explosion function for ship
+                    console.log("mayday! we've been hit!");
+                    addParticles(self.ship);
+                    deleteShots.push(shot);
+                    newShip();
+                }
+            }
+        });
+
+        deleteAsters.forEach(function(asteroid)
+        {
+            self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
+            splitAsteroid(asteroid);
+            AsteroidsGame.audio.playRockExplosionFx();
+        });
+
+        deleteAlien.forEach(function(alien)
+        {
+            self.aliens.splice(self.aliens.indexOf(alien), 1);
+            AsteroidsGame.audio.playShipExplosionFx();
+        });
+
+        deleteShots.forEach(function(shot)
+        {
+            self.laserShots.splice(self.laserShots.indexOf(shot), 1);
+        });
+    };
+
+
+    function detectTouch(object, element) {
+        var distToOthers = calcDistance(object.position.x,
+            object.position.y,
+            element.position.x,
+            element.position.y);
+        var bothRadius = (element.size.width + element.size.height) / 4
+            + (object.size.width + object.size.height) / 4;
+        return distToOthers <= bothRadius;
+    }
+
+    function calcDistance(x1, y1, x2, y2)
+    {
+            return Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1),2)));
+    }
 
     function Texture(spec) {
         var that = spec;
@@ -173,7 +333,7 @@ AsteroidsGame.objects = (function(self) {
 
         that.moveInAngle = function(angle, elapsedTime) {
             move(elapsedTime, angle);
-        }
+        };
 
         that.render = function() {
             graphics.context.save();
@@ -190,176 +350,6 @@ AsteroidsGame.objects = (function(self) {
             );
 
 			graphics.context.restore();
-        };
-
-        function addParticles(spec)
-        {
-               var particles = particleSystem({
-			            image : AsteroidsGame.graphics.images['images/fire.png'],
-                        center: {x: spec.position.x, y: spec.position.y},
-			            speed: {mean: 50, stdev: 25},
-			            lifetime: {mean: 5, stdev: 1}
-		            }, AsteroidsGame.graphics );
-
-                   /*for(var i = 0; i< 4; i++)
-                   {
-                       particles.create();
-                   }*/
-
-                   self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
-        }
-
-        self.astShipCollision = function (adding)
-        {
-            adding = adding || false;
-            var detected = false;
-            self.asteroids.forEach(function(asteroid)
-            {
-               if(detectTouch(asteroid, self.ship))
-               {
-                    if(!adding)
-                    {
-                        addParticles(self.ship);
-                        newShip();
-                    }
-
-                   detected = true;
-               }
-
-            })
-
-            return detected;
-         };
-
-        self.alienShipCollision = function(adding)
-        {
-            adding = adding || false;
-            var detected = false;
-            self.aliens.forEach(function(alien)
-            {
-                if(detectTouch(alien, self.ship))
-               {
-                    //alien and ship collided - call explosion function for ship
-                   if(!adding)
-                   {
-                        addParticles(self.ship);
-                        newShip();
-                   }
-                   detected = true;
-               }
-            })
-            return detected;
-          }
-
-        function newShip()
-        {
-            var COLL_FACTOR = 12;
-            self.ship = {};
-            self.loadShip();
-
-            self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
-            self.ship.size.height *= COLL_FACTOR;
-
-            while(self.astShipCollision(true) || self.alienShipCollision(true))
-            {
-                self.ship = {};
-                var randX = Random.nextRange(10, graphics.canvas.width-10);
-                var randY = Random.nextRange(10, graphics.canvas.height-10);
-
-                self.loadShip(randX, randY);
-                self.ship.size.width *= COLL_FACTOR;
-                self.ship.size.height *= COLL_FACTOR;
-            }
-
-            self.ship.size.width /= COLL_FACTOR;
-            self.ship.size.height /= COLL_FACTOR;
-        }
-
-        self.shotCollision = function()
-        {
-            var deleteAsters = [];
-            var deleteShots = [];
-            var deleteAlien = [];
-
-            self.laserShots.forEach(function(shot)
-            {
-                if(shot.shooter == self.ship)
-                {
-                    self.asteroids.forEach(function(asteroid)
-                    {
-                        if(detectTouch(shot, asteroid))
-                        {
-                            //explode that asteroid now!
-                            console.log("asteroid explosion");
-                            addParticles(asteroid);
-                            deleteAsters.push(asteroid);
-                            deleteShots.push(shot);
-                        }
-                    })
-
-                    self.aliens .forEach(function(alien)
-                    {
-                         if(detectTouch(shot, alien))
-                        {
-                            //explode that alien now!
-                            console.log("alien explosion!");
-                            addParticles(alien);
-                            deleteShots.push(shot);
-                            deleteAlien.push(alien);
-                        }
-                    })
-
-                }else
-                {
-                    if(detectTouch(shot, self.ship))
-                    {
-                        //shot and ship collided - call explosion function for ship
-                        console.log("mayday! we've been hit!");
-                        addParticles(self.ship);
-                        deleteShots.push(shot);
-                        newShip();
-                    }
-                }
-            })
-
-            deleteAsters.forEach(function(asteroid)
-            {
-                self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
-            })
-
-            deleteAlien.forEach(function(alien)
-            {
-                self.aliens.splice(self.aliens.indexOf(alien), 1);
-            })
-
-            deleteShots.forEach(function(shot)
-            {
-                self.laserShots.splice(self.laserShots.indexOf(shot), 1);
-            })
-        }
-
-
-        function detectTouch(object, element)
-        {
-             var distToOthers = calcDistance(object.position.x,
-             object.position.y,
-             element.position.x,
-             element.position.y);
-             var bothRadius = (element.size.width + element.size.height)/4
-                   + (object.size.width + object.size.height)/4;
-             if(distToOthers <= bothRadius)
-             {
-                   //collition detected in hereeeee mayday! we've been hit!
-                 return true;
-             }else
-             {
-                 return false;
-             }
-        }
-
-        function calcDistance(x1, y1, x2, y2)
-        {
-                return Math.sqrt((Math.pow((x2 - x1), 2) + Math.pow((y2 - y1),2)));
         };
 
         that.update = function() {
