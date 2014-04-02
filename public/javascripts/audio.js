@@ -71,9 +71,6 @@ AsteroidsGame.audio = (function(self) {
         });
 
         screens.gameScreen.on('beforeShow', function() {
-            if (self.sounds['audio/background_game.wav'].currentTime > 0) {
-                return;
-            }
             self.playGameMusic();
         });
     };

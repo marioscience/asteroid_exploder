@@ -279,6 +279,7 @@ AsteroidsGame.objects = (function(self) {
     function newShip()
     {
         AsteroidsGame.audio.playShipExplosionFx();
+        AsteroidsGame.lives--;
 
         var COLL_FACTOR = 12;
         self.ship = {};

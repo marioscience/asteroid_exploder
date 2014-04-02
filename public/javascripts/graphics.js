@@ -16,7 +16,8 @@ AsteroidsGame.graphics = (function(self, $) {
         options: $('#optionsMenu'),
         keyboard: $('#keyboardMenu'),
         audio: $('#audioMenu'),
-        highscores: $('#highscoresMenu')
+        highscores: $('#highscoresMenu'),
+        submitScore: $('#submitScore')
     };
 
     var screenStack = [];
@@ -24,8 +25,6 @@ AsteroidsGame.graphics = (function(self, $) {
     var scoreOffset = { x: 45, y: 35 };
     var levelOffset = { x: 70, y: 20 };
     var livesOffset = { x: scoreOffset.x - livesImageSize / 4, y: scoreOffset.y + 15 };
-
-
 
     self.initializeInterface = function() {
         bindMenuEvents();
@@ -36,6 +35,18 @@ AsteroidsGame.graphics = (function(self, $) {
         screenStack.push(self.screens.menu);
         self.currentScreen = self.screens.menu;
         self.currentScreen.show();
+    };
+
+    self.showSubmitScoreScreen = function() {
+        if (self.currentScreen === self.screens.submitScore) {
+            return;
+        }
+        self.clear();
+        self.drawBackground();
+        screenStack.pop();
+        self.currentScreen = self.screens.menu;
+        goToScreen(self.screens.submitScore);
+        AsteroidsGame.audio.playMenuMusic();
     };
 
     self.clear = function() {
@@ -72,7 +83,6 @@ AsteroidsGame.graphics = (function(self, $) {
         self.context.font = 'normal 16pt Hyperspace';
 
         while (livesAmount--) {
-            //self.context.fillText('V', livesOffset.x + 25 * livesAmount, livesOffset.y);
             self.context.drawImage(
                 livesImage,
                 livesOffset.x + livesImageSize * livesAmount, livesOffset.y,
@@ -105,8 +115,9 @@ AsteroidsGame.graphics = (function(self, $) {
     }
 
     function bindMenuEvents() {
-        self.screens.audio.bind('beforeShow', function () { restoreAudioConfig(); });
-        self.screens.keyboard.bind('beforeShow', function () { restoreKeyConfig(); });
+        self.screens.audio.on('beforeShow', function () { restoreAudioConfig(); });
+        self.screens.keyboard.on('beforeShow', function () { restoreKeyConfig(); });
+        self.screens.submitScore.on('beforeShow', function () { $('#txtName').focus(); });
         $('button#btnOptions').click(function() { goToScreen(self.screens.options); });
         $('button#btnKeyboard').click(function() { goToScreen(self.screens.keyboard); });
         $('button#btnHighscores').click(function() { goToScreen(self.screens.highscores); });
@@ -114,6 +125,8 @@ AsteroidsGame.graphics = (function(self, $) {
         $('button#btnSounds').click(function() { goToScreen(self.screens.audio); });
         $('button#btnApplyAudio').click(function() { applyAudioConfig(); });
         $('button#btnApplyKeys').click(function() { applyKeyConfig(); });
+        $('button#btnSubmitScore').click(function() { doSubmitScore(); });
+
         $('.backButton').click(function() { outOfScreen(); });
 
         $('button#btnNewGame').click(function() {
@@ -215,6 +228,12 @@ AsteroidsGame.graphics = (function(self, $) {
         $('#sliderFx').val(audioConfig.fxVolume);
     }
 
+    function doSubmitScore() {
+        //TODO: vaina pa submitear el score.
+        alert("se sumitio la vaina");
+        outOfScreen();
+    }
+
     CanvasRenderingContext2D.prototype.clear = function() {
 		this.save();
 		this.setTransform(1, 0, 0, 1, 0, 0);
@@ -224,6 +243,9 @@ AsteroidsGame.graphics = (function(self, $) {
 
     return self;
 }(AsteroidsGame.graphics || {}, jQuery));
+
+
+
 
 
 /*

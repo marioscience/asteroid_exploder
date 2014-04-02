@@ -6,14 +6,12 @@ var AsteroidsGame = (function(self) {
     "use strict";
 
     self.gameActive = false;
-    self.gameOver = false;
-
     self.gameModes = { player: {}, pc: {}};
     self.currentMode = {};
 
     self.gameTime = 0;
     self.score = 0;
-    self.lives = 3;
+    self.lives = 0;
     self.level = 0;
 
     var startTimeStamp = 0;
@@ -36,7 +34,13 @@ var AsteroidsGame = (function(self) {
 
     self.startNewGame = function() {
         self.score = 0;
-        self.gameOver = false;
+        self.lives = 3;
+        self.level = 0;
+        self.objects.aliens.length = 0;
+        self.objects.asteroids.length = 0;
+        self.objects.laserShots.length = 0;
+        self.objects.activeParticles.length = 0;
+
         self.gameActive = true;
         self.currentMode = self.gameModes.player;
         self.objects.nextAlienTimestamp = getNextAlienTime();
@@ -90,38 +94,17 @@ var AsteroidsGame = (function(self) {
 		requestAnimationFrame(gameLoop);
 	}
 
-    function updateParticles(elapsedTime)
-    {
-        var count = 0;
-        var deleteThese = [];
-        self.objects.activeParticles.forEach(function(particle)
-        {
-            particle.particle.update(elapsedTime/1000);
-            particle.particle.create();
-            particle.timealive += elapsedTime;
-            //console.log("elapsed: " + elapsedTime);
-
-            if(particle.timealive > particle.lifetime)
-            {
-                deleteThese.push(count);
-            }
-
-            count++;
-        });
-
-        deleteThese.forEach(function(i)
-        {
-            self.objects.activeParticles.splice(i, 1);
-        })
-    }
-
-
     function update(elapsedTime) {
+        if (!self.gameActive) {
+            return;
+        }
+
         self.gameTime = lastTimeStamp - startTimeStamp;
 
         // check game status
         if (self.lives === 0) {
-
+            self.gameActive = false;
+            self.graphics.showSubmitScoreScreen();
             return;
         }
 
@@ -145,6 +128,10 @@ var AsteroidsGame = (function(self) {
     }
 
     function render() {
+        if (!self.gameActive) {
+            return;
+        }
+
         self.graphics.clear();
         self.graphics.drawBackground();
         self.objects.asteroids.forEach(function(asteroid) { asteroid.render(); });
@@ -220,6 +207,31 @@ var AsteroidsGame = (function(self) {
 
         expiredShots.forEach(function(shot) {
             self.objects.laserShots.splice(self.objects.laserShots.indexOf(shot), 1);
+        });
+    }
+
+    function updateParticles(elapsedTime)
+    {
+        var count = 0;
+        var deleteThese = [];
+        self.objects.activeParticles.forEach(function(particle)
+        {
+            particle.particle.update(elapsedTime/1000);
+            particle.particle.create();
+            particle.timealive += elapsedTime;
+            //console.log("elapsed: " + elapsedTime);
+
+            if(particle.timealive > particle.lifetime)
+            {
+                deleteThese.push(count);
+            }
+
+            count++;
+        });
+
+        deleteThese.forEach(function(i)
+        {
+            self.objects.activeParticles.splice(i, 1);
         });
     }
 

@@ -64,6 +64,10 @@ h1.title {
     font-style: italic;
 }
 
+h1.game-over {
+    font-style: normal;
+}
+
 h3.screen-title {
     margin-top: 5px;
     font-size: 28px;
@@ -96,7 +100,7 @@ button.menu-item:first-of-type {
     cursor: pointer;
 }
 
-.config-container, #credit-content {
+.config-container, #credit-content, #score-container {
     width: 50%;
     margin: 11% auto auto auto;
 }
@@ -122,4 +126,23 @@ button.menu-item:first-of-type {
 #credit-content span {
     display: block;
     margin-bottom: 4%;
+}
+
+span#game-score {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+input#txtName {
+    background-color: rgba(0,0,0,0);
+    font-family: inherit;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    border: 1px solid white;
+}
+
+input#txtName:focus {
+    outline: none;
 }

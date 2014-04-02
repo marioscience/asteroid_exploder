@@ -39,8 +39,7 @@ window.addEventListener('load', function() {
 
                 'preload!javascripts/input.js',
                 'preload!javascripts/objects.js',
-                'preload!javascripts/configuration.js',
-                'preload!javascripts/logic.js'
+                'preload!javascripts/configuration.js'
 			],
 			complete : function() {
 				console.log('All files requested for loading...');
