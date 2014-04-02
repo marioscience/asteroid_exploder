@@ -30,7 +30,7 @@ html, body {
 
 body {
     color: white;
-    font: 14px Hyperspace, Helvetica, Arial, sans-serif;
+    font: 16px Hyperspace, Helvetica, Arial, sans-serif;
     background: url('../images/black_lozenge.png') repeat;
 }
 
@@ -100,7 +100,7 @@ button.menu-item:first-of-type {
     cursor: pointer;
 }
 
-.config-container, #credit-content, #score-container {
+.config-container, #credit-content, #score-container, #scoresTable {
     width: 50%;
     margin: 11% auto auto auto;
 }

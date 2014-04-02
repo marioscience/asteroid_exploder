@@ -18,7 +18,7 @@ AsteroidsGame.input = (function(self) {
     };
 
     self.getKeyName = function(keyCode) {
-        return KeyEvent.getKeyByValue(keyCode).split("VK_").pop();
+        return getKeyByValue(KeyEvent, keyCode).split("VK_").pop();
     };
 
     function registerKeyBinding(key, handler) {
@@ -169,3 +169,16 @@ if (typeof KeyEvent === 'undefined') {
 		DOM_VK_META: 224
 	};
 }
+
+/*
+*  Extend object type to get an attribute name by its value.
+*/
+function getKeyByValue(object, value) {
+    for( var prop in object ) {
+        if( object.hasOwnProperty( prop ) ) {
+             if( object[ prop ] === value )
+                 return prop;
+        }
+    }
+    return null;
+};

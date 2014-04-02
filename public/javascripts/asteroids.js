@@ -8,8 +8,9 @@ var AsteroidsGame = (function(self) {
     self.gameActive = false;
     self.gameModes = { player: {}, pc: {}};
     self.currentMode = {};
-
     self.gameTime = 0;
+
+    self.highscores = [];
     self.score = 0;
     self.lives = 0;
     self.level = 0;
@@ -18,11 +19,14 @@ var AsteroidsGame = (function(self) {
     var lastTimeStamp = 0;
 
     self.initialize = function() {
+        self.loadHighscores();
         self.configuration.loadConfigurations();
+
         self.audio.bindScreenSounds({ menuScreen: self.graphics.screens.menu,
             gameScreen: self.graphics.screens.game,
             menuItems: $('.menu-item')
         });
+
         self.graphics.initializeInterface();
         self.input.updateKeyBindings();
     };
@@ -36,6 +40,7 @@ var AsteroidsGame = (function(self) {
         self.score = 0;
         self.lives = 3;
         self.level = 0;
+
         self.objects.aliens.length = 0;
         self.objects.asteroids.length = 0;
         self.objects.laserShots.length = 0;
@@ -79,6 +84,30 @@ var AsteroidsGame = (function(self) {
 
     self.shootLaser = function() {
         self.objects.loadLaserShot(lastTimeStamp, self.objects.ship, self.objects.ship.angle);
+    };
+
+    self.loadHighscores = function() {
+        $.get('/v1/highscores')
+            .done(function(data) {
+                self.highscores = data;
+                localStorage.setObject('highscores', self.highscores); })
+            .fail(function() {
+                self.highscores = localStorage.getObject('highscores') || []; })
+            .always(function() {
+                self.graphics.updateHighscores();
+            }
+        );
+    };
+
+    self.submitCurrentScore = function(name) {
+        $.ajax({ url: '/v1/highscores?name=' + name + '&score=' + self.score, type: 'post' })
+            .fail(function() {
+                alert("Could not submit score. sorry...");
+            })
+            .always(function() {
+                self.loadHighscores();
+            }
+        );
     };
 
     function gameLoop(timestamp) {

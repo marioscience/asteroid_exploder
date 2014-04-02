@@ -5,8 +5,10 @@
 
 var express = require('express');
 var routes = require('./routes');
+var highscores = require('./routes/highscores.js');
 var http = require('http');
 var path = require('path');
+
 
 var app = express();
 
@@ -27,7 +29,16 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+
 app.get('/', routes.index);
+app.get('/v1/highscores', highscores.all);
+app.post('/v1/highscores', highscores.add);
+
+
+app.all('v1/*', function(request, response) {
+    response.writeHead(501);
+    response.end();
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

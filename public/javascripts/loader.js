@@ -88,39 +88,8 @@ Storage.prototype.getObject = function(key) {
 
 
 /*
- *  Extend object type to get an attribute name by its value.
- */
-Object.prototype.getKeyByValue = function( value ) {
-    for( var prop in this ) {
-        if( this.hasOwnProperty( prop ) ) {
-             if( this[ prop ] === value )
-                 return prop;
-        }
-    }
-    return null;
-};
-
-/*
- * Extend Function type to debounce.
- */
-
-function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		clearTimeout(timeout);
-		timeout = setTimeout(function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		}, wait);
-		if (immediate && !timeout) func.apply(context, args);
-	};
-}
-
-
-/*
- * Array.indexOf polyfill
- */
+* Array.indexOf polyfill
+*/
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement, fromIndex) {
@@ -153,6 +122,23 @@ if (!Array.prototype.indexOf) {
     };
 }
 
+/*
+* Extend String type to support string formatting.
+* Source: http://stackoverflow.com/questions/1038746/equivalent-of-string-format-in-jquery/1038930#1038930
+*/
+String.format = function() {
+  var s = arguments[0];
+  for (var i = 0; i < arguments.length - 1; i++) {
+    var reg = new RegExp("\\{" + i + "\\}", "gm");
+    s = s.replace(reg, arguments[i + 1]);
+  }
+
+  return s;
+};
+
+/*
+* Math.sign polyfill.
+*/
 if (!Math.sign) {
     Math.sign = function(number) {
         return (number)? ((number < 0)? -1: 1): 0;

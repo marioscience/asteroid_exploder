@@ -12,10 +12,10 @@ AsteroidsGame.graphics = (function(self, $) {
     self.screens = {
         game: $('#game'),
         menu: $('#mainMenu'),
+        audio: $('#audioMenu'),
         credits: $('#credits'),
         options: $('#optionsMenu'),
         keyboard: $('#keyboardMenu'),
-        audio: $('#audioMenu'),
         highscores: $('#highscoresMenu'),
         submitScore: $('#submitScore')
     };
@@ -25,6 +25,7 @@ AsteroidsGame.graphics = (function(self, $) {
     var scoreOffset = { x: 45, y: 35 };
     var levelOffset = { x: 70, y: 20 };
     var livesOffset = { x: scoreOffset.x - livesImageSize / 4, y: scoreOffset.y + 15 };
+    var scoreRowTemplate = '<tr><td>{0}</td><td>{1}</td></tr>';
 
     self.initializeInterface = function() {
         bindMenuEvents();
@@ -102,10 +103,22 @@ AsteroidsGame.graphics = (function(self, $) {
 			spec.image,
 			spec.center.x - spec.size/2,
 			spec.center.y - spec.size/2,
-			spec.size, spec.size);
+			spec.size, spec.size
+        );
 
 		self.context.restore();
 	};
+
+    self.updateHighscores = function() {
+        var tableContent = [];
+        AsteroidsGame.highscores.forEach(function(highscore) {
+            tableContent.push(String.format(scoreRowTemplate, highscore.name, highscore.score));
+        });
+
+        $('#scoresTable').find('tbody')
+            .empty()
+            .append($(tableContent.join('')));
+    };
 
     function resizeCanvas() {
         var width = $(window).width();
@@ -118,6 +131,7 @@ AsteroidsGame.graphics = (function(self, $) {
         self.screens.audio.on('beforeShow', function () { restoreAudioConfig(); });
         self.screens.keyboard.on('beforeShow', function () { restoreKeyConfig(); });
         self.screens.submitScore.on('beforeShow', function () { $('#txtName').focus(); });
+
         $('button#btnOptions').click(function() { goToScreen(self.screens.options); });
         $('button#btnKeyboard').click(function() { goToScreen(self.screens.keyboard); });
         $('button#btnHighscores').click(function() { goToScreen(self.screens.highscores); });
@@ -229,8 +243,13 @@ AsteroidsGame.graphics = (function(self, $) {
     }
 
     function doSubmitScore() {
-        //TODO: vaina pa submitear el score.
-        alert("se sumitio la vaina");
+        var name = $('#txtName').val();
+        if (!name) {
+            alert("Enter a name!");
+            return;
+        }
+
+        AsteroidsGame.submitCurrentScore(name);
         outOfScreen();
     }
 
