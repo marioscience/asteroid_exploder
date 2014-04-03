@@ -214,19 +214,20 @@ AsteroidsGame.objects = (function (self) {
                 //alien and ship collided - call explosion function for ship
                 if (!adding) {
                     addParticles(self.ship);
-                    deleteAsteroid.push(alien);
+                    deleteAlien.push(alien);
                     newShip();
                 }
                 detected = true;
             }
         });
-        return detected;
-
 
         deleteAlien.forEach(function (alien) {
             self.aliens.splice(self.aliens.indexOf(alien), 1);
             AsteroidsGame.audio.playShipExplosionFx();
         });
+
+        return detected;
+
     };
 
 
