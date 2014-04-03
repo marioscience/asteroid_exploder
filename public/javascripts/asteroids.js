@@ -15,8 +15,10 @@ var AsteroidsGame = (function(self) {
     self.lives = 0;
     self.level = 0;
 
+
     var startTimeStamp = 0;
     var lastTimeStamp = 0;
+    var livesGained = 1;
 
     self.initialize = function() {
         self.loadHighscores();
@@ -123,15 +125,23 @@ var AsteroidsGame = (function(self) {
 		requestAnimationFrame(gameLoop);
 	}
 
+    function addLife()
+    {
+        var vaina = self.score/(1000 * livesGained );
+
+        if(vaina > 1)
+        {
+            livesGained++;
+            self.lives++;
+        }
+    }
+
     function update(elapsedTime) {
         if (!self.gameActive) {
             return;
         }
 
-        if(self.score % 10000)
-        {
-            self.lives += 1;
-        }
+        addLife();
 
         self.gameTime = lastTimeStamp - startTimeStamp;
 
@@ -224,6 +234,7 @@ var AsteroidsGame = (function(self) {
             asteroid.moveInInitialDirection(elapsedTime);
             asteroid.rotateLeft(elapsedTime);
             self.objects.astShipCollision();
+            self.objects.astAlienCollision();
             asteroid.update();
         });
     }
@@ -271,7 +282,7 @@ var AsteroidsGame = (function(self) {
     }
 
     function advanceLevel() {
-        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level, self.objects.asteroidTypes.big);
+        self.objects.loadAsteroids(1/*self.objects.asteroidsCount + self.level*/, self.objects.asteroidTypes.big);
         self.level++;
     }
 
