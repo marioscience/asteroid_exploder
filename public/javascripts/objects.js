@@ -153,6 +153,8 @@ AsteroidsGame.objects = (function (self) {
         }
     };
 
+
+
     self.astAlienCollision = function (adding) {
         var deleteAsters = [];
         var deleteAlien = [];
@@ -228,6 +230,11 @@ AsteroidsGame.objects = (function (self) {
 
         return detected;
 
+    };
+
+    self.thrust = function(spaceCraft)
+    {
+      //make a particle splash in the spaceCraft position and going in oposite direction to the angle of the spaceCraft
     };
 
 
