@@ -188,7 +188,7 @@ AsteroidsGame.objects = (function (self) {
         return detected;
     };
 
-    self.astShipCollision = function (adding) {
+    self.astShipCollision = function(adding) {
         adding = adding || false;
         var detected = false;
         self.asteroids.forEach(function (asteroid) {
