@@ -128,11 +128,17 @@ var AsteroidsGame = (function(self) {
             return;
         }
 
+        if(self.score % 10000)
+        {
+            self.lives += 1;
+        }
+
         self.gameTime = lastTimeStamp - startTimeStamp;
 
         // check game status
         if (self.lives === 0) {
             self.gameActive = false;
+            document.getElementById('game-score').innerHTML = self.score;
             self.graphics.showSubmitScoreScreen();
             return;
         }

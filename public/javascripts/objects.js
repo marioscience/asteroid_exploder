@@ -210,6 +210,15 @@ AsteroidsGame.objects = (function(self) {
                         addParticles(asteroid);
                         deleteAsters.push(asteroid);
                         deleteShots.push(shot);
+
+                        if(asteroid.size.width == self.asteroidTypes.big.size){
+                            AsteroidsGame.score += 20;
+                        }else if(asteroid.size.width == self.asteroidTypes.medium.size){
+                            AsteroidsGame.score += 50;
+                        }else if(asteroid.size.width == self.asteroidTypes.small.size){
+                            AsteroidsGame.score += 100;
+                        }
+
                     }
                 });
 
