@@ -193,15 +193,23 @@ AsteroidsGame.objects = (function (self) {
     self.astShipCollision = function(adding) {
         adding = adding || false;
         var detected = false;
+        var deleteAsters = [];
         self.asteroids.forEach(function (asteroid) {
             if (detectTouch(asteroid, self.ship)) {
 
                 if (!adding) {
                     addParticles(self.ship);
+                    deleteAsters.push(asteroid);
                     newShip();
                 }
                 detected = true;
             }
+        });
+
+        deleteAsters.forEach(function (asteroid) {
+            self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
+            splitAsteroid(asteroid);
+            AsteroidsGame.audio.playRockExplosionFx();
         });
 
         return detected;
@@ -329,7 +337,7 @@ AsteroidsGame.objects = (function (self) {
         self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
     }
 
-    function newShip() {
+    function newShip(hyperspacing) {
         AsteroidsGame.audio.playShipExplosionFx();
         AsteroidsGame.lives--;
 
