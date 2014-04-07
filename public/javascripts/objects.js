@@ -47,6 +47,7 @@ AsteroidsGame.objects = (function (self) {
 
         self.ship = Texture({
             image: shipImage,
+            explosionImage: 'shipexp',
             position: { x: newX || initialX, y: newY || initialY },
             size: { width: width, height: height },
             speed: { x: 0, y: 0 },
@@ -76,6 +77,7 @@ AsteroidsGame.objects = (function (self) {
 
         self.laserShots.push(Texture({
             image: laserImage,
+            explosionImage: 'fire',//explosionImage: 'none',
             position: { x: shooter.position.x, y: shooter.position.y },
             size: { width: width, height: height },
             speed: { x: 2 * xComponent * laserSpeedLimit, y: 2 * yComponent * laserSpeedLimit },
@@ -111,6 +113,7 @@ AsteroidsGame.objects = (function (self) {
 
         self.aliens.push(Texture({
             image: alienImage,
+            explosionImage: 'alienexp',//explosionImage: 'alienExplosion',
             position: { x: startSide.x, y: yPosition },
             size: { width: width, height: height },
             speed: { x: 0, y: 0 },
@@ -146,6 +149,7 @@ AsteroidsGame.objects = (function (self) {
 
             self.asteroids.push(Texture({
                 image: asteroidImage,
+                explosionImage: 'asteroidexp',//explosionImage: 'asteroidExplosion',
                 position: { x: xPosition, y: yPosition },
                 size: { width: width, height: height },
                 speed: { x: Random.nextDoubleRange(-1.5, 1.5), y: Random.nextDoubleRange(-1.5, 1.5) },
@@ -172,6 +176,7 @@ AsteroidsGame.objects = (function (self) {
 
                     if (!adding) {
                         addParticles(alien);
+                        addParticles(asteroid);
                         deleteAlien.push(alien);
                         deleteAsters.push(asteroid);
                     }
@@ -204,6 +209,7 @@ AsteroidsGame.objects = (function (self) {
 
                 if (!adding) {
                     addParticles(self.ship);
+                    addParticles(asteroid);
                     deleteAsters.push(asteroid);
                     self.newShip(false);
                 }
@@ -229,6 +235,7 @@ AsteroidsGame.objects = (function (self) {
                 //alien and ship collided - call explosion function for ship
                 if (!adding) {
                     addParticles(self.ship);
+                    addParticles(alien);
                     deleteAlien.push(alien);
                     self.newShip(false);
                 }
@@ -370,7 +377,7 @@ AsteroidsGame.objects = (function (self) {
 
     function addParticles(spec) {
         var particles = particleSystem({
-            image: AsteroidsGame.graphics.images['images/fire.png'],
+            image: AsteroidsGame.graphics.images['images/'+spec.explosionImage+'.png'],
             center: {x: spec.position.x, y: spec.position.y},
             speed: {mean: 50, stdev: 25},
             lifetime: {mean: 5, stdev: 1}

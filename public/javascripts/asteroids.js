@@ -40,7 +40,7 @@ var AsteroidsGame = (function(self) {
 
     self.startNewGame = function() {
         self.score = 0;
-        self.lives = 3;
+        self.lives = 20;
         self.level = 0;
 
         self.objects.aliens.length = 0;
