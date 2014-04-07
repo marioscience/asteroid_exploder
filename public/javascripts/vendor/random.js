@@ -16,7 +16,7 @@ var Random = (function() {
         return Math.random() < 0.5 ? ((1 - Math.random()) * (max-min) + min) : (Math.random() * (max-min) + min);
     }
 	
-	function nextCircleVector() {
+	function nextCircleVector(divide) {
 		var angle = Math.random() * 2 * Math.PI;
 		return {
 			x: Math.cos(angle),

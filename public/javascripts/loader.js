@@ -26,6 +26,7 @@ window.addEventListener('load', function() {
                 'preload!images/alien.png',
                 'preload!images/laser_shot.png',
                 'preload!images/fire.png',
+                'preload!images/alien_small.png',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',

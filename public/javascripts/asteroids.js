@@ -47,6 +47,7 @@ var AsteroidsGame = (function(self) {
         self.objects.asteroids.length = 0;
         self.objects.laserShots.length = 0;
         self.objects.activeParticles.length = 0;
+        self.objects.thrustParticles.length = 0;
 
         self.gameActive = true;
         self.currentMode = self.gameModes.player;
@@ -68,8 +69,11 @@ var AsteroidsGame = (function(self) {
     };
 
     self.moveShip = function(elapsedTime) {
+        self.objects.toggleThrustRender = true;
+        self.objects.thrust(self.objects.ship);
         self.objects.ship.moveForward(elapsedTime);
         self.audio.playThrustFx();
+        console.log(self.objects.ship.acceleration);
     };
 
     self.rotateShipRight = function(elapsedTime) {
@@ -81,7 +85,7 @@ var AsteroidsGame = (function(self) {
     };
 
     self.enterHyperspace = function(elapsedTime) {
-        //TODO: implement hyperspace
+        self.objects.newShip(true);
     };
 
     self.shootLaser = function() {
@@ -127,7 +131,7 @@ var AsteroidsGame = (function(self) {
 
     function addLife()
     {
-        var vaina = self.score/(1000 * livesGained );
+        var vaina = self.score/(10000 * livesGained );
 
         if(vaina > 1)
         {
@@ -169,7 +173,9 @@ var AsteroidsGame = (function(self) {
         updateAsteroids(elapsedTime);
         updateAliens(elapsedTime);
         updateLaserShots(elapsedTime);
-        updateParticles(elapsedTime);
+        updateParticles(elapsedTime, self.objects.activeParticles);
+        updateThrustParticles(elapsedTime, self.objects.thrustParticles);
+        self.objects.updateParticlePos(self.objects.ship);
     }
 
     function render() {
@@ -183,6 +189,7 @@ var AsteroidsGame = (function(self) {
         self.objects.laserShots.forEach(function(shot) { shot.render(); });
         self.objects.aliens.forEach(function(alien) { alien.render(); });
         self.objects.activeParticles.forEach(function(particle) { particle.particle.render(); });
+        self.objects.thrustParticles.forEach(function(particle) { particle.particle.render(); });
         self.objects.ship.render();
         if (self.currentMode === self.gameModes.player) {
             self.graphics.drawScore();
@@ -256,18 +263,28 @@ var AsteroidsGame = (function(self) {
         });
     }
 
-    function updateParticles(elapsedTime)
+    function updateThrustParticles(elapsedTime, particleArray)
+    {
+        particleArray.forEach(function(particle)
+        {
+            particle.particle.update(elapsedTime/1000);
+            particle.particle.create();
+
+        });
+    }
+
+    function updateParticles(elapsedTime, particleArray)
     {
         var count = 0;
         var deleteThese = [];
-        self.objects.activeParticles.forEach(function(particle)
+        particleArray.forEach(function(particle)
         {
             particle.particle.update(elapsedTime/1000);
             particle.particle.create();
             particle.timealive += elapsedTime;
             //console.log("elapsed: " + elapsedTime);
 
-            if(particle.timealive > particle.lifetime)
+            if(particleArray == self.objects.activeParticles && particle.timealive > particle.lifetime)
             {
                 deleteThese.push(count);
             }
@@ -277,7 +294,7 @@ var AsteroidsGame = (function(self) {
 
         deleteThese.forEach(function(i)
         {
-            self.objects.activeParticles.splice(i, 1);
+            particleArray.splice(i, 1);
         });
     }
 

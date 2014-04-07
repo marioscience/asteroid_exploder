@@ -10,6 +10,7 @@ AsteroidsGame.objects = (function (self) {
     self.asteroids = [];
     self.laserShots = [];
     self.activeParticles = [];
+    self.thrustParticles = [];
     self.asteroidsCount = 3;
 
     self.alienInterval = 20000;
@@ -22,22 +23,24 @@ AsteroidsGame.objects = (function (self) {
     var asteroidImage = graphics.images['images/asteroid_big1.png'];
     var alienImage = graphics.images['images/alien.png'];
     var laserImage = graphics.images['images/laser_shot.png'];
+    self.toggleThrustRender = false;
+
 
     self.alienTypes = {
-        big: { size: 25 },
-        small: { size: 15 }
+        big: { size: 35 },
+        small: { size: 25 }
     };
 
     self.asteroidTypes = {
-        big: { size: 50 },
-        medium: { size: 35 },
-        small: { size: 20 }
+        big: { size: 80 },
+        medium: { size: 50 },
+        small: { size: 30 }
     };
     self.asteroidTypes.big.split = { type: self.asteroidTypes.medium, amount: 3 };
     self.asteroidTypes.medium.split = { type: self.asteroidTypes.small, amount: 4 };
 
     self.loadShip = function (newX, newY) {
-        var width = 20;
+        var width = 35;
         var height = width * shipImage.height / shipImage.width;
         var initialX = graphics.canvas.width / 2;
         var initialY = graphics.canvas.height / 2;
@@ -55,6 +58,9 @@ AsteroidsGame.objects = (function (self) {
             lastShotTimestamp: 0,
             laserThrottle: 200
         });
+
+    self.thrust(self.ship);//to start the thruster
+
     };
 
     self.loadLaserShot = function (timestamp, shooter, angle) {
@@ -65,7 +71,7 @@ AsteroidsGame.objects = (function (self) {
         var xComponent = Math.sin(angle * Math.PI / 180);
         var yComponent = Math.cos(angle * Math.PI / 180);
 
-        var width = 2;
+        var width = 5;
         var height = width * laserImage.height / laserImage.width + 5;
 
         self.laserShots.push(Texture({
@@ -154,7 +160,6 @@ AsteroidsGame.objects = (function (self) {
     };
 
 
-
     self.astAlienCollision = function (adding) {
         var deleteAsters = [];
         var deleteAlien = [];
@@ -190,7 +195,7 @@ AsteroidsGame.objects = (function (self) {
         return detected;
     };
 
-    self.astShipCollision = function(adding) {
+    self.astShipCollision = function (adding) {
         adding = adding || false;
         var detected = false;
         var deleteAsters = [];
@@ -200,7 +205,7 @@ AsteroidsGame.objects = (function (self) {
                 if (!adding) {
                     addParticles(self.ship);
                     deleteAsters.push(asteroid);
-                    newShip();
+                    self.newShip(false);
                 }
                 detected = true;
             }
@@ -225,7 +230,7 @@ AsteroidsGame.objects = (function (self) {
                 if (!adding) {
                     addParticles(self.ship);
                     deleteAlien.push(alien);
-                    newShip();
+                    self.newShip(false);
                 }
                 detected = true;
             }
@@ -240,83 +245,120 @@ AsteroidsGame.objects = (function (self) {
 
     };
 
-    self.thrust = function(spaceCraft)
-    {
-      //make a particle splash in the spaceCraft position and going in oposite direction to the angle of the spaceCraft
+    self.thrust = function (spaceCraft) {
+        //make a particle splash in the spaceCraft position and going in oposite direction to the angle of the spaceCraft
+
+        var particles = particleSystem({
+                image: AsteroidsGame.graphics.images['images/fire.png'],
+                center: {x: spaceCraft.position.x, y: spaceCraft.position.y},
+                speed: {mean: 10, stdev: 2},
+                lifetime: {mean: 1, stdev: 0.2}
+            },
+
+            AsteroidsGame.graphics,
+            {
+                direction: {
+                    x: Math.cos((spaceCraft.angle * Math.PI / 180) - 67.5),
+                    y: Math.sin((spaceCraft.angle * Math.PI / 180) - 67.5)
+                },
+                size: Random.nextGaussian(20, 2)
+
+
+            })
+        if (!self.thrustParticles[0])
+            self.thrustParticles[0] = {particle: particles, lifetime: 1500, timealive: 0};
+
     };
 
+    self.updateParticlePos = function (spaceCraft) {
+        if (!self.toggleThrustRender) {
+            self.thrustParticles = [];//[0].particle.lifetime = 0;
+        } else {
+            if (self.thrustParticles[0]) {
+                self.thrustParticles[0].particle.center = self.ship.position;
+                self.thrustParticles[0].particle.direction = {
+                    x: Math.cos((spaceCraft.angle * Math.PI / 180) - 67.5),
+                    y: Math.sin((spaceCraft.angle * Math.PI / 180) - 67.5)
+                };
 
-    self.shotCollision = function () {
-        var deleteAsters = [];
-        var deleteShots = [];
-        var deleteAlien = [];
+                self.toggleThrustRender = false;
+            }
+        }
 
-        self.laserShots.forEach(function (shot) {
+    },
 
-            self.asteroids.forEach(function (asteroid) {
-                if (detectTouch(shot, asteroid)) {
-                    //explode that asteroid now!
-                    console.log("asteroid explosion");
-                    addParticles(asteroid);
-                    deleteAsters.push(asteroid);
-                    deleteShots.push(shot);
-                    if (shot.shooter == self.ship) {
-                        if (asteroid.size.width == self.asteroidTypes.big.size) {
-                            AsteroidsGame.score += 20;
-                        } else if (asteroid.size.width == self.asteroidTypes.medium.size) {
-                            AsteroidsGame.score += 50;
-                        } else if (asteroid.size.width == self.asteroidTypes.small.size) {
-                            AsteroidsGame.score += 100;
+
+        self.shotCollision = function () {
+            var deleteAsters = [];
+            var deleteShots = [];
+            var deleteAlien = [];
+
+            self.laserShots.forEach(function (shot) {
+
+                self.asteroids.forEach(function (asteroid) {
+                    if (detectTouch(shot, asteroid)) {
+                        //explode that asteroid now!
+                        console.log("asteroid explosion");
+                        addParticles(asteroid);
+                        deleteAsters.push(asteroid);
+                        deleteShots.push(shot);
+                        if (shot.shooter == self.ship) {
+                            if (asteroid.size.width == self.asteroidTypes.big.size) {
+                                AsteroidsGame.score += 20;
+                            } else if (asteroid.size.width == self.asteroidTypes.medium.size) {
+                                AsteroidsGame.score += 50;
+                            } else if (asteroid.size.width == self.asteroidTypes.small.size) {
+                                AsteroidsGame.score += 100;
+                            }
+                        }
+
+                    }
+                });
+
+                self.aliens.forEach(function (alien) {
+                    if (detectTouch(shot, alien)) {
+                        //explode that alien now!
+                        if (shot.shooter != alien) {
+                            console.log("alien explosion!");
+                            addParticles(alien);
+                            deleteShots.push(shot);
+                            deleteAlien.push(alien);
+                            if (alien.size.width == self.alienTypes.big.size) {
+                                AsteroidsGame.score += 200;
+                            } else if (alien.size.width == self.alienTypes.small.size) {
+                                AsteroidsGame.score += 1000;
+                            }
                         }
                     }
+                });
 
+                if (shot.shooter != self.ship) {
+                    if (detectTouch(shot, self.ship)) {
+                        //shot and ship collided - call explosion function for ship
+                        console.log("mayday! we've been hit!");
+                        addParticles(self.ship);
+                        deleteShots.push(shot);
+                        self.newShip(false);
+                    }
                 }
             });
 
-            self.aliens.forEach(function (alien) {
-                if (detectTouch(shot, alien)) {
-                    //explode that alien now!
-                    if (shot.shooter != alien) {
-                        console.log("alien explosion!");
-                        addParticles(alien);
-                        deleteShots.push(shot);
-                        deleteAlien.push(alien);
-                        if (alien.size.width == self.alienTypes.big.size) {
-                            AsteroidsGame.score += 200;
-                        } else if (alien.size.width == self.alienTypes.small.size) {
-                            AsteroidsGame.score += 1000;
-                        }
-                    }
-                }
-            })
 
-            if (shot.shooter != self.ship) {
-                if (detectTouch(shot, self.ship)) {
-                    //shot and ship collided - call explosion function for ship
-                    console.log("mayday! we've been hit!");
-                    addParticles(self.ship);
-                    deleteShots.push(shot);
-                    newShip();
-                }
-            }
-        });
+            deleteAsters.forEach(function (asteroid) {
+                self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
+                splitAsteroid(asteroid);
+                AsteroidsGame.audio.playRockExplosionFx();
+            });
 
+            deleteAlien.forEach(function (alien) {
+                self.aliens.splice(self.aliens.indexOf(alien), 1);
+                AsteroidsGame.audio.playShipExplosionFx();
+            });
 
-        deleteAsters.forEach(function (asteroid) {
-            self.asteroids.splice(self.asteroids.indexOf(asteroid), 1);
-            splitAsteroid(asteroid);
-            AsteroidsGame.audio.playRockExplosionFx();
-        });
-
-        deleteAlien.forEach(function (alien) {
-            self.aliens.splice(self.aliens.indexOf(alien), 1);
-            AsteroidsGame.audio.playShipExplosionFx();
-        });
-
-        deleteShots.forEach(function (shot) {
-            self.laserShots.splice(self.laserShots.indexOf(shot), 1);
-        });
-    };
+            deleteShots.forEach(function (shot) {
+                self.laserShots.splice(self.laserShots.indexOf(shot), 1);
+            });
+        };
 
     function splitAsteroid(asteroid) {
         var split = asteroid.type.split;
@@ -337,9 +379,11 @@ AsteroidsGame.objects = (function (self) {
         self.activeParticles.push({particle: particles, lifetime: 1500, timealive: 0});
     }
 
-    function newShip(hyperspacing) {
-        AsteroidsGame.audio.playShipExplosionFx();
-        AsteroidsGame.lives--;
+    self.newShip = function (hyperspacing) {
+        if (!hyperspacing) {
+            AsteroidsGame.audio.playShipExplosionFx();
+            AsteroidsGame.lives--;
+        }
 
         var COLL_FACTOR = 12;
         self.ship = {};

@@ -1,10 +1,10 @@
 /*jslint browser: true, white: true, plusplus: true */
 /*global Random */
-function particleSystem(spec, graphics) {
+function particleSystem(spec, graphics, options) {
 	'use strict';
-	var that = {},
-		nextName = 1,	// unique identifier for the next particle
-		particles = {};	// Set of all active particles
+	var that = spec,
+		nextName = 1;	// unique identifier for the next particle
+		that.particles = {},	// Set of all active particles
 
 	//------------------------------------------------------------------
 	//
@@ -14,15 +14,16 @@ function particleSystem(spec, graphics) {
 	that.create = function() {
 		var p = {
 				image: spec.image,
-				size: Random.nextGaussian(75, 25),
+				size: options? options.size : Random.nextGaussian(20, 10),
 				center: {x: spec.center.x, y: spec.center.y},
-				direction: Random.nextCircleVector(),
-				speed: Random.nextGaussian(spec.speed.mean, spec.speed.stdev), // pixels per second
+				direction: spec.direction? spec.direction : options? options.direction : Random.nextCircleVector(),//,
+				speed: options? Random.nextGaussian(spec.speed.mean + 300, 0) : Random.nextGaussian(spec.speed.mean, spec.speed.stdev - 5), // pixels per second
 				rotation: 0,
-				lifetime: Random.nextGaussian(spec.lifetime.mean, spec.lifetime.stdev),	// How long the particle should live, in seconds
+				lifetime: options? Random.nextGaussian(spec.lifetime.mean -0.9, spec.lifetime.stdev - 0.15) : Random.nextGaussian(spec.lifetime.mean, spec.lifetime.stdev),	// How long the particle should live, in seconds
+
 				alive: 0	// How long the particle has been alive, in seconds
 			};
-		
+		console.log("lifetime mean: "+spec.lifetime.mean+" stdev: "+spec.lifetime.stdev);
 		//
 		// Ensure we have a valid size - gaussian numbers can be negative
 		p.size = Math.max(1, p.size);
@@ -31,7 +32,7 @@ function particleSystem(spec, graphics) {
 		p.lifetime = Math.max(0.01, p.lifetime);
 		//
 		// Assign a unique name to each particle
-		particles[nextName++] = p;
+		that.particles[nextName++] = p;
 	};
 	
 	//------------------------------------------------------------------
@@ -45,9 +46,9 @@ function particleSystem(spec, graphics) {
 			value,
 			particle;
 		
-		for (value in particles) {
-			if (particles.hasOwnProperty(value)) {
-				particle = particles[value];
+		for (value in that.particles) {
+			if (that.particles.hasOwnProperty(value)) {
+				particle = that.particles[value];
 				//
 				// Update how long it has been alive
 				particle.alive += elapsedTime;
@@ -69,10 +70,11 @@ function particleSystem(spec, graphics) {
 			}
 		}
 
+
 		//
 		// Remove all of the expired particles
 		for (particle = 0; particle < removeMe.length; particle++) {
-			delete particles[removeMe[particle]];
+			delete that.particles[removeMe[particle]];
 		}
 		removeMe.length = 0;
 	};
@@ -86,9 +88,9 @@ function particleSystem(spec, graphics) {
 		var value,
 			particle;
 		
-		for (value in particles) {
-			if (particles.hasOwnProperty(value)) {
-				particle = particles[value];
+		for (value in that.particles) {
+			if (that.particles.hasOwnProperty(value)) {
+				particle = that.particles[value];
 				graphics.drawImage(particle);
 			}
 		}
