@@ -71,6 +71,9 @@ AsteroidsGame.audio = (function(self) {
         });
 
         screens.gameScreen.on('beforeShow', function() {
+            if (AsteroidsGame.currentMode === AsteroidsGame.gameModes.pc) {
+                return;
+            }
             self.playGameMusic();
         });
     };

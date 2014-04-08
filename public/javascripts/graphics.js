@@ -42,13 +42,31 @@ AsteroidsGame.graphics = (function(self, $) {
         if (self.currentScreen === self.screens.submitScore) {
             return;
         }
-        self.clear();
-        self.drawBackground();
+        $('game-score').text(AsteroidsGame.score);
         screenStack.pop();
         self.currentScreen = self.screens.menu;
         goToScreen(self.screens.submitScore);
         AsteroidsGame.audio.playMenuMusic();
     };
+
+    self.returnToMenuScreen = function() {
+        while (screenStack.length > 1) {
+            screenStack.pop();
+        }
+
+        self.currentScreen = self.screens.menu;
+        self.currentScreen.show();
+    }
+
+    self.goToGameScreen = function() {
+        goToScreen(self.screens.game);
+
+    }
+
+    self.cleanScreen = function() {
+        self.clear();
+        self.drawBackground();
+    }
 
     self.clear = function() {
         self.context.clear();
@@ -71,6 +89,7 @@ AsteroidsGame.graphics = (function(self, $) {
         var currentScore = "" + AsteroidsGame.score;
 
         self.context.textAlign = 'left';
+        self.context.fillStyle = '#ffffff';
         self.context.font = 'normal 16pt Hyperspace';
         self.context.fillText(currentScore, scoreOffset.x, scoreOffset.y);
     };
@@ -91,6 +110,14 @@ AsteroidsGame.graphics = (function(self, $) {
             );
         }
     };
+
+    self.drawAttractModeText = function() {
+        self.context.textAlign = 'left';
+        self.context.fillStyle = '#ffffff';
+        self.context.font = 'normal 16pt Hyperspace';
+        self.context.fillText('Attract Mode', scoreOffset.x, scoreOffset.y);
+    };
+
 
     self.drawImage = function(spec) {
 		self.context.save();

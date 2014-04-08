@@ -15,10 +15,11 @@ var AsteroidsGame = (function(self) {
     self.lives = 0;
     self.level = 0;
 
-
     var startTimeStamp = 0;
     var lastTimeStamp = 0;
+    var lastIdleTimeStamp = 0;
     var livesGained = 1;
+
 
     self.initialize = function() {
         self.loadHighscores();
@@ -29,18 +30,78 @@ var AsteroidsGame = (function(self) {
             menuItems: $('.menu-item')
         });
 
+
+        window.addEventListener('keypress', inputOnAttract, false);
+        window.addEventListener('mousemove', inputOnAttract, false);
+        window.addEventListener('click', inputOnAttract, false);
+
         self.graphics.initializeInterface();
         self.input.updateKeyBindings();
+        waitForIdleTime();
     };
 
+    function waitForIdleTime() {
+        lastIdleTimeStamp = performance.now();
+        requestAnimationFrame(idleLoop);
+    }
+
+    function idleLoop(timestamp) {
+        var idleTime = Math.abs(timestamp - lastIdleTimeStamp);
+        if (idleTime >= 2000) {//10000) {
+            self.startAttractGame();
+            lastIdleTimeStamp = timestamp;
+            return;
+        }
+
+		requestAnimationFrame(idleLoop);
+    }
+
+    var oldMousePosition = { x: 0, y: 0 };
     self.startAttractGame = function() {
-        //TODO: develop ai for attract mode
+        if (self.gameActive) {
+            return;
+        }
+        self.level = 0;
+        self.lives = 1;
+        self.gameActive = true;
+        oldMousePosition = { x: 0, y: 0 };
+
+        self.objects.aliens.length = 0;
+        self.objects.asteroids.length = 0;
+        self.objects.laserShots.length = 0;
+        self.objects.activeParticles.length = 0;
+        self.objects.nextAlienTimestamp = getNextAlienTime();
         self.currentMode = self.gameModes.pc;
+        self.graphics.goToGameScreen();
+        self.objects.loadShip();
+        advanceLevel();
+
+        startTimeStamp = lastTimeStamp = performance.now();
+		requestAnimationFrame(gameLoop);
+
     };
+
+
+    function inputOnAttract(event) {
+        if (!self.gameActive) {
+            lastIdleTimeStamp = performance.now();
+            return;
+        }
+        if (self.currentMode !== self.gameModes.pc) {
+            return;
+        }
+        if (oldMousePosition.x === 0 && oldMousePosition.y === 0) {
+            oldMousePosition = { x: event.x, y: event.y };
+            return;
+        }
+
+        self.lives = 0;
+        lastIdleTimeStamp = performance.now();
+    }
 
     self.startNewGame = function() {
         self.score = 0;
-        self.lives = 20;
+        self.lives = 3;
         self.level = 0;
 
         self.objects.aliens.length = 0;
@@ -131,7 +192,7 @@ var AsteroidsGame = (function(self) {
 
     function addLife()
     {
-        var vaina = self.score/(10000 * livesGained );
+        var vaina = self.score/(1000 * livesGained );
 
         if(vaina > 1)
         {
@@ -145,15 +206,21 @@ var AsteroidsGame = (function(self) {
             return;
         }
 
-        addLife();
-
         self.gameTime = lastTimeStamp - startTimeStamp;
 
         // check game status
         if (self.lives === 0) {
             self.gameActive = false;
-            document.getElementById('game-score').innerHTML = self.score;
+            self.graphics.cleanScreen();
+
+            if (self.currentMode === self.gameModes.pc) {
+                self.graphics.returnToMenuScreen();
+                waitForIdleTime();
+                return;
+            }
+
             self.graphics.showSubmitScoreScreen();
+            waitForIdleTime();
             return;
         }
 
@@ -163,11 +230,17 @@ var AsteroidsGame = (function(self) {
 
 
         // handle pressed keys
-        self.input.keyBindings.forEach(function(binding) {
-            if (self.input.keyPresses.hasOwnProperty(binding.key)) {
-                binding.handler(elapsedTime);
-            }
-        });
+        if (self.currentMode === self.gameModes.player) {
+            addLife();
+            self.input.keyBindings.forEach(function(binding) {
+                if (self.input.keyPresses.hasOwnProperty(binding.key)) {
+                    binding.handler(elapsedTime);
+                }
+            });
+        } else if (self.currentMode === self.gameModes.pc) {
+            moveShipWithAI(elapsedTime);
+        }
+
 
         updateShip(elapsedTime);
         updateAsteroids(elapsedTime);
@@ -185,6 +258,7 @@ var AsteroidsGame = (function(self) {
 
         self.graphics.clear();
         self.graphics.drawBackground();
+        self.objects.activeParticles.forEach(function(particle) { particle.particle.render(); });
         self.objects.asteroids.forEach(function(asteroid) { asteroid.render(); });
         self.objects.laserShots.forEach(function(shot) { shot.render(); });
         self.objects.aliens.forEach(function(alien) { alien.render(); });
@@ -195,6 +269,80 @@ var AsteroidsGame = (function(self) {
             self.graphics.drawScore();
             self.graphics.drawLevel();
             self.graphics.drawLives();
+        } else if (self.currentMode === self.gameModes.pc) {
+            self.graphics.drawAttractModeText();
+        }
+    }
+
+    function moveShipWithAI(elapsedTime) {
+        var closestEnemy = getClosestEnemy(300, true);
+        if (!closestEnemy) {
+            closestEnemy = getClosestEnemy(300, false);
+            if (getDistance(self.objects.ship, closestEnemy) > 300) {
+                self.moveShip(elapsedTime);
+            }
+        }
+
+        var angleToEnemy = getAngleToEnemy(closestEnemy);
+        if (Math.abs((self.objects.ship.angle - angleToEnemy)) < 5) {
+            self.shootLaser();
+        } else {
+            self.objects.ship.rotate(elapsedTime, angleToEnemy);
+        }
+    }
+
+    function getAngleToEnemy(enemy) {
+        var position = self.objects.ship.position;
+        var distance = getDistance(self.objects.ship, enemy);
+        var xComponent = (enemy.position.x - position.x) + (enemy.speed.x * (distance / 6));
+        var yComponent = (position.y - enemy.position.y) + (enemy.speed.y * (distance / 6));
+
+        var angle = Math.atan2(xComponent, yComponent) * 180 / Math.PI;
+        return ((angle < 0) ? 360 - Math.abs(angle) : angle) % 360;
+    }
+
+    function getClosestEnemy(range, inRange) {
+        var position = self.objects.ship.position;
+        var minimumDistance = Number.MAX_VALUE;
+        var closestEnemy = null;
+
+        self.objects.asteroids.forEach(function(asteroid){
+            var distance = getDistance(self.objects.ship, asteroid);
+
+            if (distance <= minimumDistance) {
+                if (!inRange || inRange && distance <= range) {
+                    minimumDistance = distance;
+                    closestEnemy = asteroid;
+                }
+            }
+        });
+
+        self.objects.aliens.forEach(function(alien){
+            var distance = Math.sqrt(Math.pow(position.x - alien.position.x, 2) +
+                Math.pow(position.y - alien.position.y, 2));
+
+            if (distance <= minimumDistance) {
+                if (!inRange || inRange && distance <= range) {
+                    minimumDistance = distance;
+                    closestEnemy = alien;
+                }
+            }
+        });
+
+        return closestEnemy;
+    }
+
+    function getDistance(object1, object2) {
+        return Math.sqrt(Math.pow(object1.position.x - object2.position.x, 2) +
+                Math.pow(object1.position.y - object2.position.y, 2));
+    }
+
+    function addLife() {
+        var vaina = self.score/(10000 * livesGained );
+
+        if(vaina > 1) {
+            livesGained++;
+            self.lives++;
         }
     }
 
@@ -299,7 +447,7 @@ var AsteroidsGame = (function(self) {
     }
 
     function advanceLevel() {
-        self.objects.loadAsteroids(1/*self.objects.asteroidsCount + self.level*/, self.objects.asteroidTypes.big);
+        self.objects.loadAsteroids(self.objects.asteroidsCount + self.level, self.objects.asteroidTypes.big);
         self.level++;
     }
 
@@ -319,7 +467,7 @@ var AsteroidsGame = (function(self) {
             var yComponent = alien.position.y - self.objects.ship.position.y;
             angle = Math.atan2(xComponent, yComponent) * 180 / Math.PI;
         }
-        return angle;
+        return Random.nextRange(angle - 20, angle + 20);
     }
 
 

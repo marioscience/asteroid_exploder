@@ -28,7 +28,6 @@ AsteroidsGame.objects = (function (self) {
     var laserImage = graphics.images['images/laser_shot.png'];
     self.toggleThrustRender = false;
 
-
     self.alienTypes = {
         big: { size: 35 },
         small: { size: 30 }
@@ -75,7 +74,7 @@ AsteroidsGame.objects = (function (self) {
         var xComponent = Math.sin(angle * Math.PI / 180);
         var yComponent = Math.cos(angle * Math.PI / 180);
 
-        var width = 5;
+        var width = 3;
         var height = width * laserImage.height / laserImage.width + 5;
 
         self.laserShots.push(Texture({
@@ -167,6 +166,7 @@ AsteroidsGame.objects = (function (self) {
     };
 
 
+
     self.astAlienCollision = function (adding) {
         var deleteAsters = [];
         var deleteAlien = [];
@@ -203,7 +203,7 @@ AsteroidsGame.objects = (function (self) {
         return detected;
     };
 
-    self.astShipCollision = function (adding) {
+    self.astShipCollision = function(adding) {
         adding = adding || false;
         var detected = false;
         var deleteAsters = [];
@@ -466,6 +466,12 @@ AsteroidsGame.objects = (function (self) {
             that.angle -= that.angularSpeed * (elapsedTime / 1000);
             that.angle = ((that.angle < 0) ? 360 - Math.abs(that.angle) : that.angle) % 360;
         };
+
+        that.rotate = function(elapsedTime, angle) {
+            that.angle += that.angularSpeed * (elapsedTime / 1000) * Math.sign(angle - that.angle);
+            that.angle = ((that.angle < 0) ? 360 - Math.abs(that.angle) : that.angle) % 360;
+        };
+
 
         that.moveForward = function (elapsedTime) {
             move(elapsedTime, that.angle);

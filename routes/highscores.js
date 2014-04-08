@@ -2,8 +2,12 @@
  * Created by jcaraballo17 on 4/2/14.
  */
 
+var fs = require('fs');
+var fileName = 'highscores.json';
+
 var scoresAmount = 10;
-var scores = [];
+var scores;
+loadScores();
 
 exports.all = function(request, response) {
     "use strict";
@@ -29,12 +33,25 @@ function addScore(score) {
     scores.push(score);
     scores.sort(function (a, b) { return +b.score - +a.score });
     scores = scores.slice(0, scoresAmount);
-    //TODO: persist modified scores to file.
+    fs.writeFile(fileName, JSON.stringify(scores), function(err) {
+        if(err) {
+            console.log(err);
+        } else {
+            console.log("The file was saved!");
+        }
+    });
 }
 
-/*
+
 function loadScores() {
     "use strict";
     //TODO: read scores from file.
+    fs.readFile(fileName, function (err, data) {
+        if (err) {
+            console.log(err);
+            scores = [];
+            return;
+        }
+        scores = JSON.parse(data);
+    });
 }
-*/
