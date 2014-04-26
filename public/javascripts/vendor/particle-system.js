@@ -23,7 +23,6 @@ function particleSystem(spec, graphics, options) {
 
 				alive: 0	// How long the particle has been alive, in seconds
 			};
-		console.log("lifetime mean: "+spec.lifetime.mean+" stdev: "+spec.lifetime.stdev);
 		//
 		// Ensure we have a valid size - gaussian numbers can be negative
 		p.size = Math.max(1, p.size);
