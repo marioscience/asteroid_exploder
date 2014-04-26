@@ -130,6 +130,11 @@ var AsteroidsGame = (function(self) {
         self.lives = 3;
         self.level = 0;
 
+        self.shieldTime = 0;
+        self.shields = 5;
+        self.shieldSizeOffset = 0;
+        self.shieldColor = "#00FF00";
+
         self.objects.aliens.length = 0;
         self.objects.asteroids.length = 0;
         self.objects.laserShots.length = 0;
