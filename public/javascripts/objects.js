@@ -347,16 +347,18 @@ AsteroidsGame.objects = (function (self) {
                             addParticles(alien, 'alien');
                             deleteShots.push(shot);
                             deleteAlien.push(alien);
+                            if (shot.shooter == self.ship) {
                             if (alien.size.width == self.alienTypes.big.size) {
                                 AsteroidsGame.score += 200;
                             } else if (alien.size.width == self.alienTypes.small.size) {
                                 AsteroidsGame.score += 1000;
                             }
+                            }
                         }
                     }
                 });
 
-
+                if (shot.shooter != self.ship) {
                     if (detectTouch(shot, self.ship)) {
                         //shot and ship collided - call explosion function for ship
                         if(AsteroidsGame.shieldTime <= 0)
@@ -371,7 +373,9 @@ AsteroidsGame.objects = (function (self) {
                         }
                         deleteShots.push(shot);
                     }
+                }
             });
+
 
 
             deleteAsters.forEach(function (asteroid) {
