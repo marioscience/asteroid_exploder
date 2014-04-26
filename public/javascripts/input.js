@@ -15,6 +15,7 @@ AsteroidsGame.input = (function(self) {
         registerKeyBinding(keyCodes.right, AsteroidsGame.rotateShipRight);
         registerKeyBinding(keyCodes.hyperspace, AsteroidsGame.enterHyperspace);
         registerKeyBinding(keyCodes.shoot, AsteroidsGame.shootLaser);
+        registerKeyBinding(keyCodes.shield, AsteroidsGame.activateShield);
     };
 
     self.getKeyName = function(keyCode) {

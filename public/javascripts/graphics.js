@@ -22,9 +22,11 @@ AsteroidsGame.graphics = (function(self, $) {
 
     var screenStack = [];
     var livesImageSize = 18;
+    var shieldImageSize = 18;
     var scoreOffset = { x: 45, y: 35 };
     var levelOffset = { x: 70, y: 20 };
     var livesOffset = { x: scoreOffset.x - livesImageSize / 4, y: scoreOffset.y + 15 };
+    var shieldOffset = { x: livesOffset.x - shieldImageSize / 4, y: livesOffset.y + 25 };
     var scoreRowTemplate = '<tr><td>{0}</td><td>{1}</td></tr>';
 
     self.initializeInterface = function() {
@@ -107,6 +109,23 @@ AsteroidsGame.graphics = (function(self, $) {
                 livesImage,
                 livesOffset.x + livesImageSize * livesAmount, livesOffset.y,
                 livesImageSize, livesImageSize * livesImage.height / livesImage.width
+            );
+        }
+    };
+
+    self.drawShields = function() {
+        var shieldAmount = AsteroidsGame.shields;
+        var shieldImage = self.images['images/shield.png'];
+
+        self.context.textAlign = 'left';
+        self.context.fillStyle = '#ffffff';
+        self.context.font = 'normal 16pt Hyperspace';
+
+        while (shieldAmount--) {
+            self.context.drawImage(
+                shieldImage,
+                shieldOffset.x + shieldImageSize * shieldAmount, shieldOffset.y,
+                shieldImageSize, shieldImageSize * shieldImage.height / shieldImage.width
             );
         }
     };

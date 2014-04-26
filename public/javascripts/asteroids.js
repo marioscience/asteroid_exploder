@@ -14,6 +14,10 @@ var AsteroidsGame = (function(self) {
     self.score = 0;
     self.lives = 0;
     self.level = 0;
+    self.shieldTime = 0;
+    self.shields = 5;
+    self.shieldSizeOffset = 0;
+    self.shieldColor = "#00FF00";
 
     var startTimeStamp = 0;
     var lastTimeStamp = 0;
@@ -39,6 +43,28 @@ var AsteroidsGame = (function(self) {
         self.input.updateKeyBindings();
         waitForIdleTime();
     };
+
+    function updateShield(elapsedTime)
+    {
+        if(self.shieldTime > 0 )
+        {
+            self.shieldTime -= elapsedTime;
+        }
+
+        if(self.shieldTime < 1000)
+        {
+            self.shieldColor = "#FF0000";
+            self.shieldSizeOffset = 6;
+        }else if(self.shieldTime < 3000)
+        {
+            self.shieldColor = "#FFEE00";
+            self.shieldSizeOffset = 3;
+        }else
+        {
+            self.shieldColor = "#00FF00";
+            self.shieldSizeOffset = 0;
+        }
+    }
 
     function waitForIdleTime() {
         lastIdleTimeStamp = performance.now();
@@ -153,6 +179,21 @@ var AsteroidsGame = (function(self) {
         self.objects.loadLaserShot(lastTimeStamp, self.objects.ship, self.objects.ship.angle);
     };
 
+    self.activateShield = function (wasKilled) {
+
+        if (self.shieldTime <= 0) {
+            if (typeof(wasKilled) !== undefined) {
+                if (self.shields > 0) {
+                    self.shields -= 1;
+                } else {
+                    return;
+                }
+            }
+            self.shieldTime = 6000; //6 seconds
+        }
+
+    };
+
     self.loadHighscores = function() {
         $.get('/v1/highscores')
             .done(function(data) {
@@ -243,6 +284,7 @@ var AsteroidsGame = (function(self) {
 
 
         updateShip(elapsedTime);
+        updateShield(elapsedTime);
         updateAsteroids(elapsedTime);
         updateAliens(elapsedTime);
         updateLaserShots(elapsedTime);
@@ -265,12 +307,31 @@ var AsteroidsGame = (function(self) {
         self.objects.activeParticles.forEach(function(particle) { particle.particle.render(); });
         self.objects.thrustParticles.forEach(function(particle) { particle.particle.render(); });
         self.objects.ship.render();
+        self.renderShield();
         if (self.currentMode === self.gameModes.player) {
             self.graphics.drawScore();
             self.graphics.drawLevel();
             self.graphics.drawLives();
+            self.graphics.drawShields();
         } else if (self.currentMode === self.gameModes.pc) {
             self.graphics.drawAttractModeText();
+        }
+    }
+
+    self.renderShield = function()
+    {
+        if(self.shieldTime > 0)
+        {
+            var xCenter = self.objects.ship.position.x;
+            var yCenter = self.objects.ship.position.y;
+            var radious = (self.objects.ship.size.width + self.objects.ship.size.height)/2;
+
+            self.graphics.context.strokeStyle = self.shieldColor;
+            self.graphics.context.beginPath();
+            self.graphics.context.arc(xCenter, yCenter, radious - self.shieldSizeOffset, 0, 2*Math.PI);
+            self.graphics.context.arc(xCenter, yCenter, radious - self.shieldSizeOffset-3, 0, 2*Math.PI);
+            self.graphics.context.arc(xCenter, yCenter, radious - self.shieldSizeOffset-4, 0, 2*Math.PI);
+            self.graphics.context.stroke();
         }
     }
 
@@ -357,7 +418,8 @@ var AsteroidsGame = (function(self) {
             self.objects.nextAlienTimestamp = getNextAlienTime();
         }
 
-         self.objects.alienShipCollision();
+        self.objects.alienShipCollision();
+
         // update aliens.
         var expiredAliens = [];
         var alienDestinationOffset = 10;

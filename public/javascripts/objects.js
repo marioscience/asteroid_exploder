@@ -211,10 +211,17 @@ AsteroidsGame.objects = (function (self) {
             if (detectTouch(asteroid, self.ship)) {
 
                 if (!adding) {
-                    addParticles(self.ship, 'ship');
                     addParticles(asteroid, 'asteroid');
                     deleteAsters.push(asteroid);
-                    self.newShip(false);
+                    if(AsteroidsGame.shieldTime <= 0)
+                    {
+                        AsteroidsGame.shieldColor = "#FF0000";
+                        addParticles(self.ship, 'ship');
+                        self.newShip(false);
+                    }else
+                    {
+                        AsteroidsGame.shieldColor = "#00FF00";
+                    }
                 }
                 detected = true;
             }
@@ -237,10 +244,17 @@ AsteroidsGame.objects = (function (self) {
             if (detectTouch(alien, self.ship)) {
                 //alien and ship collided - call explosion function for ship
                 if (!adding) {
-                    addParticles(self.ship, 'ship');
                     addParticles(alien, 'alien');
                     deleteAlien.push(alien);
-                    self.newShip(false);
+                    if(AsteroidsGame.shieldTime <= 0)
+                    {
+                        AsteroidsGame.shieldColor = "#FF0000";
+                        addParticles(self.ship, 'ship');
+                        self.newShip(false);
+                    }else
+                    {
+                        AsteroidsGame.shieldColor = "#00FF00";
+                    }
                 }
                 detected = true;
             }
@@ -342,15 +356,21 @@ AsteroidsGame.objects = (function (self) {
                     }
                 });
 
-                if (shot.shooter != self.ship) {
+
                     if (detectTouch(shot, self.ship)) {
                         //shot and ship collided - call explosion function for ship
-                        console.log("mayday! we've been hit!");
-                        addParticles(self.ship, 'ship');
+                        if(AsteroidsGame.shieldTime <= 0)
+                        {
+                            console.log("mayday! we've been hit!");
+                            AsteroidsGame.shieldColor = "#FF0000";
+                            addParticles(self.ship, 'ship');
+                            self.newShip(false);
+                        }else
+                        {
+                            AsteroidsGame.shieldColor = "#00FF00";
+                        }
                         deleteShots.push(shot);
-                        self.newShip(false);
                     }
-                }
             });
 
 
