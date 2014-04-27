@@ -286,8 +286,6 @@ AsteroidsGame.objects = (function (self) {
                     y: Math.sin((spaceCraft.angle * Math.PI / 180) - 67.5)
                 },
                 size: Random.nextGaussian(20, 2)
-
-
             })
         if (!self.thrustParticles[0])
             self.thrustParticles[0] = {particle: particles, lifetime: 1500, timealive: 0};
