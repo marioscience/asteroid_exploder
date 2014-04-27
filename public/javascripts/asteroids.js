@@ -18,6 +18,7 @@ var AsteroidsGame = (function(self) {
     self.shields = 5;
     self.shieldSizeOffset = 0;
     self.shieldColor = "#00FF00";
+    self.shieldHits = 0;
 
     self.hyperspaceCooldown = {
         required: 100,
@@ -56,7 +57,7 @@ var AsteroidsGame = (function(self) {
             self.shieldTime -= elapsedTime;
         }
 
-        if(self.shieldTime < 1000)
+        if(self.shieldTime < 1000 )
         {
             self.shieldColor = "#FF0000";
             self.shieldSizeOffset = 6;
@@ -69,6 +70,13 @@ var AsteroidsGame = (function(self) {
             self.shieldColor = "#00FF00";
             self.shieldSizeOffset = 0;
         }
+
+        if(self.shieldHits >= 2)
+        {
+            self.shieldTime = 0;
+            self.shieldHits = 0;
+        }
+
     }
 
     function waitForIdleTime() {
@@ -195,6 +203,7 @@ var AsteroidsGame = (function(self) {
 
     self.activateShield = function(wasKilled) {
         if (self.shieldTime <= 0) {
+            self.shieldHits = 0;
             if (typeof(wasKilled) !== undefined) {
                 if (self.shields > 0) {
                     self.shields -= 1;

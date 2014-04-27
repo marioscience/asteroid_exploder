@@ -220,6 +220,7 @@ AsteroidsGame.objects = (function (self) {
                         self.newShip(false);
                     }else
                     {
+                        AsteroidsGame.shieldHits += 1;
                         AsteroidsGame.shieldColor = "#00FF00";
                     }
                 }
@@ -253,6 +254,7 @@ AsteroidsGame.objects = (function (self) {
                         self.newShip(false);
                     }else
                     {
+                        AsteroidsGame.shieldHits += 1;
                         AsteroidsGame.shieldColor = "#00FF00";
                     }
                 }
@@ -367,6 +369,7 @@ AsteroidsGame.objects = (function (self) {
                             self.newShip(false);
                         }else
                         {
+                            AsteroidsGame.shieldHits += 1;
                             AsteroidsGame.shieldColor = "#00FF00";
                         }
                         deleteShots.push(shot);
