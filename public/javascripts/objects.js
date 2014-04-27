@@ -417,6 +417,11 @@ AsteroidsGame.objects = (function (self) {
             speed = 25;
             lifetim = 10;
             stdLifetime = 2;
+        }else if(type === 'hyperspacing')
+        {
+            speed = 400;
+            lifetim = 0.05;
+            stdLifetime = 0.01;
         }
         else
         {
@@ -425,7 +430,9 @@ AsteroidsGame.objects = (function (self) {
             stdLifetime = 1;
         }
         var particles = particleSystem({
-            image: AsteroidsGame.graphics.images['images/'+spec.explosionImage+'.png'],
+            image: type === 'hyperspacing'?
+                AsteroidsGame.graphics.images['images/teletrans.gif']
+                : AsteroidsGame.graphics.images['images/'+spec.explosionImage+'.png'],
             center: {x: spec.position.x, y: spec.position.y},
             speed: {mean: speed, stdev: 25},
             lifetime: {mean: lifetim, stdev: stdLifetime}
@@ -440,19 +447,23 @@ AsteroidsGame.objects = (function (self) {
             AsteroidsGame.lives--;
         }
 
-        var COLL_FACTOR = 12;
+        var COLL_FACTOR = 8;
         self.ship = {};
         self.loadShip();
 
         self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
         self.ship.size.height *= COLL_FACTOR;
 
+        self.ship = {};
+        var randX = Random.nextRange(10, graphics.canvas.width - 10);
+        var randY = Random.nextRange(10, graphics.canvas.height - 10);
+
         while (self.astShipCollision(true) || self.alienShipCollision(true)) {
-            self.ship = {};
             var randX = Random.nextRange(10, graphics.canvas.width - 10);
             var randY = Random.nextRange(10, graphics.canvas.height - 10);
 
             self.loadShip(randX, randY);
+
             self.ship.size.width *= COLL_FACTOR;
             self.ship.size.height *= COLL_FACTOR;
         }
@@ -460,6 +471,11 @@ AsteroidsGame.objects = (function (self) {
         self.ship.size.width /= COLL_FACTOR;
         self.ship.size.height /= COLL_FACTOR;
     }
+
+    self.hyperspaceParticles = function()
+    {
+        addParticles(self.ship, 'hyperspacing');
+    };
 
 
     function detectTouch(object, element) {

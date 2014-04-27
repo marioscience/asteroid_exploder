@@ -165,7 +165,6 @@ var AsteroidsGame = (function(self) {
         self.objects.thrust(self.objects.ship);
         self.objects.ship.moveForward(elapsedTime);
         self.audio.playThrustFx();
-        console.log(self.objects.ship.acceleration);
     };
 
     self.rotateShipRight = function(elapsedTime) {
@@ -178,6 +177,7 @@ var AsteroidsGame = (function(self) {
 
     self.enterHyperspace = function(elapsedTime) {
         self.objects.newShip(true);
+        self.objects.hyperspaceParticles();
     };
 
     self.shootLaser = function() {

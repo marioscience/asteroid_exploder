@@ -256,6 +256,7 @@ AsteroidsGame.graphics = (function(self, $) {
             right: +$('#txtRight').get(0).dataset.key,
             hyperspace: +$('#txtHyperspace').get(0).dataset.key,
             shoot: +$('#txtShoot').get(0).dataset.key,
+            shield: +$('#txtShield').get(0).dataset.key,
             left: +$('#txtLeft').get(0).dataset.key
         };
     }
@@ -278,6 +279,8 @@ AsteroidsGame.graphics = (function(self, $) {
             .get(0).dataset.key = keyConfig.hyperspace;
         $('#txtShoot').val(getKeyName(keyConfig.shoot))
             .get(0).dataset.key = keyConfig.shoot;
+        $('#txtShield').val(getKeyName(keyConfig.shield))
+            .get(0).dataset.key = keyConfig.shield;
         $('#txtLeft').val(getKeyName(keyConfig.left))
             .get(0).dataset.key = keyConfig.left;
     }
