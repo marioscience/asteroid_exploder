@@ -280,7 +280,8 @@ var AsteroidsGame = (function(self) {
             self.graphics.cleanScreen();
 
             if (self.currentMode === self.gameModes.player) {
-                if (self.score > self.highscores.slice(-1).pop().score || self.highscores.length < 5) {
+                var lowestScore = self.highscores.slice(-1).pop() || {};
+                if (self.score > lowestScore.score || self.highscores.length < 5) {
                     self.graphics.showSubmitScoreScreen();
                     return;
                 }
