@@ -446,17 +446,13 @@ AsteroidsGame.objects = (function (self) {
         }
 
         var COLL_FACTOR = 8;
-        self.ship = {};
-        self.loadShip();
-
         self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
         self.ship.size.height *= COLL_FACTOR;
 
-        self.ship = {};
-        var randX = Random.nextRange(10, graphics.canvas.width - 10);
-        var randY = Random.nextRange(10, graphics.canvas.height - 10);
 
         while (self.astShipCollision(true) || self.alienShipCollision(true)) {
+            self.ship = {};
+            self.loadShip();
             var randX = Random.nextRange(10, graphics.canvas.width - 10);
             var randY = Random.nextRange(10, graphics.canvas.height - 10);
 
