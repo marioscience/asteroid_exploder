@@ -9,6 +9,7 @@ AsteroidsGame.input = (function(self) {
     self.keyBindings = [];
 
     self.updateKeyBindings = function() {
+        self.keyBindings.length = 0;
         var keyCodes = AsteroidsGame.configuration.keyboard;
         registerKeyBinding(keyCodes.up, AsteroidsGame.moveShip);
         registerKeyBinding(keyCodes.left, AsteroidsGame.rotateShipLeft);

@@ -40,6 +40,9 @@ var AsteroidsGame = (function(self) {
             menuItems: $('.menu-item')
         });
 
+        self.graphics.screens.menu.on('beforeShow', function() {
+            waitForIdleTime();
+        });
 
         window.addEventListener('keypress', inputOnAttract, false);
         window.addEventListener('mousemove', inputOnAttract, false);
@@ -47,7 +50,6 @@ var AsteroidsGame = (function(self) {
 
         self.graphics.initializeInterface();
         self.input.updateKeyBindings();
-        waitForIdleTime();
     };
 
     function updateShield(elapsedTime)
@@ -195,6 +197,7 @@ var AsteroidsGame = (function(self) {
         }
         self.objects.newShip(true);
         self.objects.hyperspaceParticles();
+        self.hyperspaceCooldown.current = 0;
     };
 
     self.shootLaser = function() {
@@ -276,14 +279,14 @@ var AsteroidsGame = (function(self) {
             self.gameActive = false;
             self.graphics.cleanScreen();
 
-            if (self.currentMode === self.gameModes.pc) {
-                self.graphics.returnToMenuScreen();
-                waitForIdleTime();
-                return;
+            if (self.currentMode === self.gameModes.player) {
+                if (self.score > self.highscores.slice(-1).pop().score || self.highscores.length < 5) {
+                    self.graphics.showSubmitScoreScreen();
+                    return;
+                }
             }
 
-            self.graphics.showSubmitScoreScreen();
-            waitForIdleTime();
+            self.graphics.returnToMenuScreen();
             return;
         }
 
@@ -559,7 +562,6 @@ var AsteroidsGame = (function(self) {
         }
         return Random.nextRange(angle - 20, angle + 20);
     }
-
 
     return self;
 }(AsteroidsGame || {}));
