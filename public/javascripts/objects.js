@@ -211,10 +211,18 @@ AsteroidsGame.objects = (function (self) {
             if (detectTouch(asteroid, self.ship)) {
 
                 if (!adding) {
-                    addParticles(self.ship, 'ship');
                     addParticles(asteroid, 'asteroid');
                     deleteAsters.push(asteroid);
-                    self.newShip(false);
+                    if(AsteroidsGame.shieldTime <= 0)
+                    {
+                        AsteroidsGame.shieldColor = "#FF0000";
+                        addParticles(self.ship, 'ship');
+                        self.newShip(false);
+                    }else
+                    {
+                        AsteroidsGame.shieldHits += 1;
+                        AsteroidsGame.shieldColor = "#00FF00";
+                    }
                 }
                 detected = true;
             }
@@ -237,10 +245,18 @@ AsteroidsGame.objects = (function (self) {
             if (detectTouch(alien, self.ship)) {
                 //alien and ship collided - call explosion function for ship
                 if (!adding) {
-                    addParticles(self.ship, 'ship');
                     addParticles(alien, 'alien');
                     deleteAlien.push(alien);
-                    self.newShip(false);
+                    if(AsteroidsGame.shieldTime <= 0)
+                    {
+                        AsteroidsGame.shieldColor = "#FF0000";
+                        addParticles(self.ship, 'ship');
+                        self.newShip(false);
+                    }else
+                    {
+                        AsteroidsGame.shieldHits += 1;
+                        AsteroidsGame.shieldColor = "#00FF00";
+                    }
                 }
                 detected = true;
             }
@@ -272,8 +288,6 @@ AsteroidsGame.objects = (function (self) {
                     y: Math.sin((spaceCraft.angle * Math.PI / 180) - 67.5)
                 },
                 size: Random.nextGaussian(20, 2)
-
-
             })
         if (!self.thrustParticles[0])
             self.thrustParticles[0] = {particle: particles, lifetime: 1500, timealive: 0};
@@ -333,10 +347,12 @@ AsteroidsGame.objects = (function (self) {
                             addParticles(alien, 'alien');
                             deleteShots.push(shot);
                             deleteAlien.push(alien);
+                            if (shot.shooter == self.ship) {
                             if (alien.size.width == self.alienTypes.big.size) {
                                 AsteroidsGame.score += 200;
                             } else if (alien.size.width == self.alienTypes.small.size) {
                                 AsteroidsGame.score += 1000;
+                            }
                             }
                         }
                     }
@@ -345,13 +361,22 @@ AsteroidsGame.objects = (function (self) {
                 if (shot.shooter != self.ship) {
                     if (detectTouch(shot, self.ship)) {
                         //shot and ship collided - call explosion function for ship
-                        console.log("mayday! we've been hit!");
-                        addParticles(self.ship, 'ship');
+                        if(AsteroidsGame.shieldTime <= 0)
+                        {
+                            console.log("mayday! we've been hit!");
+                            AsteroidsGame.shieldColor = "#FF0000";
+                            addParticles(self.ship, 'ship');
+                            self.newShip(false);
+                        }else
+                        {
+                            AsteroidsGame.shieldHits += 1;
+                            AsteroidsGame.shieldColor = "#00FF00";
+                        }
                         deleteShots.push(shot);
-                        self.newShip(false);
                     }
                 }
             });
+
 
 
             deleteAsters.forEach(function (asteroid) {
@@ -393,6 +418,11 @@ AsteroidsGame.objects = (function (self) {
             speed = 25;
             lifetim = 10;
             stdLifetime = 2;
+        }else if(type === 'hyperspacing')
+        {
+            speed = 400;
+            lifetim = 0.05;
+            stdLifetime = 0.01;
         }
         else
         {
@@ -401,7 +431,9 @@ AsteroidsGame.objects = (function (self) {
             stdLifetime = 1;
         }
         var particles = particleSystem({
-            image: AsteroidsGame.graphics.images['images/'+spec.explosionImage+'.png'],
+            image: type === 'hyperspacing'?
+                AsteroidsGame.graphics.images['images/teletrans.gif']
+                : AsteroidsGame.graphics.images['images/'+spec.explosionImage+'.png'],
             center: {x: spec.position.x, y: spec.position.y},
             speed: {mean: speed, stdev: 25},
             lifetime: {mean: lifetim, stdev: stdLifetime}
@@ -416,26 +448,29 @@ AsteroidsGame.objects = (function (self) {
             AsteroidsGame.lives--;
         }
 
-        var COLL_FACTOR = 12;
-        self.ship = {};
-        self.loadShip();
-
+        var COLL_FACTOR = 8;
         self.ship.size.width *= COLL_FACTOR;//This is to make the collision bigger for a small second (seriously, really small)
         self.ship.size.height *= COLL_FACTOR;
 
-        while (self.astShipCollision(true) || self.alienShipCollision(true)) {
+        do{
             self.ship = {};
             var randX = Random.nextRange(10, graphics.canvas.width - 10);
             var randY = Random.nextRange(10, graphics.canvas.height - 10);
 
             self.loadShip(randX, randY);
+
             self.ship.size.width *= COLL_FACTOR;
             self.ship.size.height *= COLL_FACTOR;
-        }
+        } while (self.astShipCollision(true) || self.alienShipCollision(true));
 
         self.ship.size.width /= COLL_FACTOR;
         self.ship.size.height /= COLL_FACTOR;
     }
+
+    self.hyperspaceParticles = function()
+    {
+        addParticles(self.ship, 'hyperspacing');
+    };
 
 
     function detectTouch(object, element) {

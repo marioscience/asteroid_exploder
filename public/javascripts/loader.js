@@ -30,6 +30,8 @@ window.addEventListener('load', function() {
                 'preload!images/alienexp.png',
                 'preload!images/asteroidexp.png',
                 'preload!images/shipexp.png',
+                'preload!images/shield.png',
+                'preload!images/teletrans.gif',
 
                 'preload!audio/click.wav',
                 'preload!audio/background_menu.wav',

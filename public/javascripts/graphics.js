@@ -22,9 +22,12 @@ AsteroidsGame.graphics = (function(self, $) {
 
     var screenStack = [];
     var livesImageSize = 18;
+    var shieldImageSize = 18;
     var scoreOffset = { x: 45, y: 35 };
     var levelOffset = { x: 70, y: 20 };
+
     var livesOffset = { x: scoreOffset.x - livesImageSize / 4, y: scoreOffset.y + 15 };
+    var shieldOffset = { x: livesOffset.x - shieldImageSize / 4, y: livesOffset.y + 25 };
     var scoreRowTemplate = '<tr><td>{0}</td><td>{1}</td></tr>';
 
     self.initializeInterface = function() {
@@ -100,7 +103,6 @@ AsteroidsGame.graphics = (function(self, $) {
 
         self.context.textAlign = 'left';
         self.context.fillStyle = '#ffffff';
-        self.context.font = 'normal 16pt Hyperspace';
 
         while (livesAmount--) {
             self.context.drawImage(
@@ -110,6 +112,44 @@ AsteroidsGame.graphics = (function(self, $) {
             );
         }
     };
+
+    self.drawShields = function() {
+        var shieldAmount = AsteroidsGame.shields;
+        var shieldImage = self.images['images/shield.png'];
+
+        self.context.textAlign = 'left';
+        self.context.fillStyle = '#ffffff';
+
+        while (shieldAmount--) {
+            self.context.drawImage(
+                shieldImage,
+                shieldOffset.x + shieldImageSize * shieldAmount, shieldOffset.y,
+                shieldImageSize, shieldImageSize * shieldImage.height / shieldImage.width
+            );
+        }
+    };
+
+    self.drawHyperspaceCooldown = function(cooldown) {
+        var barSize = {
+            width: self.canvas.width * 0.5,
+            height: 18
+        };
+
+        var barPosition = {
+            x: (self.canvas.width - barSize.width) / 2,
+            y: self.canvas.height - barSize.height * 2
+        };
+
+        var cooldownSize = barSize.width * cooldown.current / cooldown.required;
+
+        self.context.strokeStyle = '#E5E4E2';
+        self.context.fillStyle = 'rgba(188, 198, 204, 0.2)';
+        self.context.fillRect(barPosition.x, barPosition.y, barSize.width, barSize.height);
+        self.context.strokeRect(barPosition.x, barPosition.y, barSize.width, barSize.height);
+
+        self.context.fillStyle = 'rgba(72, 99, 160, 0.6)';
+        self.context.fillRect(barPosition.x, barPosition.y, cooldownSize, barSize.height);
+    }
 
     self.drawAttractModeText = function() {
         self.context.textAlign = 'left';
@@ -237,6 +277,7 @@ AsteroidsGame.graphics = (function(self, $) {
             right: +$('#txtRight').get(0).dataset.key,
             hyperspace: +$('#txtHyperspace').get(0).dataset.key,
             shoot: +$('#txtShoot').get(0).dataset.key,
+            shield: +$('#txtShield').get(0).dataset.key,
             left: +$('#txtLeft').get(0).dataset.key
         };
     }
@@ -259,6 +300,8 @@ AsteroidsGame.graphics = (function(self, $) {
             .get(0).dataset.key = keyConfig.hyperspace;
         $('#txtShoot').val(getKeyName(keyConfig.shoot))
             .get(0).dataset.key = keyConfig.shoot;
+        $('#txtShield').val(getKeyName(keyConfig.shield))
+            .get(0).dataset.key = keyConfig.shield;
         $('#txtLeft').val(getKeyName(keyConfig.left))
             .get(0).dataset.key = keyConfig.left;
     }
