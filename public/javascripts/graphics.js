@@ -17,7 +17,8 @@ AsteroidsGame.graphics = (function(self, $) {
         options: $('#optionsMenu'),
         keyboard: $('#keyboardMenu'),
         highscores: $('#highscoresMenu'),
-        submitScore: $('#submitScore')
+        submitScore: $('#submitScore'),
+        loadingScreen: $('#loadingScreen')
     };
 
     var screenStack = [];
@@ -39,6 +40,7 @@ AsteroidsGame.graphics = (function(self, $) {
         screenStack.push(self.screens.menu);
         self.currentScreen = self.screens.menu;
         self.currentScreen.show();
+        self.screens['loadingScreen'].hide();
     };
 
     self.showSubmitScoreScreen = function() {
@@ -59,17 +61,17 @@ AsteroidsGame.graphics = (function(self, $) {
 
         self.currentScreen = self.screens.menu;
         self.currentScreen.show();
-    }
+    };
 
     self.goToGameScreen = function() {
         goToScreen(self.screens.game);
 
-    }
+    };
 
     self.cleanScreen = function() {
         self.clear();
         self.drawBackground();
-    }
+    };
 
     self.clear = function() {
         self.context.clear();
@@ -149,7 +151,7 @@ AsteroidsGame.graphics = (function(self, $) {
 
         self.context.fillStyle = 'rgba(72, 99, 160, 0.6)';
         self.context.fillRect(barPosition.x, barPosition.y, cooldownSize, barSize.height);
-    }
+    };
 
     self.drawAttractModeText = function() {
         self.context.textAlign = 'left';

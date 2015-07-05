@@ -146,3 +146,10 @@ input#txtName {
 input#txtName:focus {
     outline: none;
 }
+
+section#loadingScreen {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  padding-top: 37%;
+}
